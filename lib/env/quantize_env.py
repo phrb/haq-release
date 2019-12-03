@@ -13,6 +13,7 @@ from progress.bar import Bar
 
 from lib.utils.utils import AverageMeter, accuracy, prGreen, measure_model
 from lib.utils.data_utils import get_split_train_dataset
+from lib.utils.data_utils import get_split_val_dataset
 from lib.utils.quantize_utils import quantize_model, kmeans_update_model
 
 
@@ -193,7 +194,7 @@ class QuantizeEnv:
         return org_weight
 
     def _init_data(self):
-        self.train_loader, self.val_loader, n_class = get_split_train_dataset(
+        self.train_loader, self.val_loader, n_class = get_split_val_dataset(
             self.data_type, self.batch_size, self.n_data_worker, data_root=self.data_root,
             val_size=self.val_size, train_size=self.train_size, for_inception=self.is_inception)
 
@@ -403,4 +404,3 @@ class QuantizeEnv:
             return top5.avg
         else:
             return top1.avg
-
