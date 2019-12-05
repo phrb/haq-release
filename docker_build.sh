@@ -16,6 +16,8 @@ if [ $# -eq 0 ] ; then
 fi
 
 PROXY_URL=http://web-proxy-pa.labs.hpecorp.net:8088/
+REPO_SRC_DIR=/home/bruelp/haq-release
+REPO_TARGET_DIR=/haq-release
 SRC_DIR=/shared/bruelp/imagenet
 TARGET_DIR=/haq-release/data
 IMAGE=haq-sampling:latest
@@ -32,9 +34,11 @@ do
             ;;
         -r|--run)
             sudo docker run -d \
+                 --ipc=host \
                  -it \
                  --name $CONTAINER \
                  --mount type=bind,source=$SRC_DIR,target=$TARGET_DIR \
+                 --mount type=bind,source=$REPO_SRC_DIR,target=$REPO_TARGET_DIR \
                  $IMAGE
             sudo docker exec -it $CONTAINER /bin/bash
             ;;
