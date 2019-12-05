@@ -11,6 +11,7 @@ from copy import deepcopy
 from lib.utils.utils import prYellow
 from lib.env.quantize_env import QuantizeEnv
 from lib.rl.ddpg import DDPG
+from lib.rl.rs import RS
 from tensorboardX import SummaryWriter
 
 import torch
@@ -34,6 +35,10 @@ for name in customized_models.__dict__:
 model_names = default_model_names + customized_models_names
 print('support models: ', model_names)
 
+optimizer_names = ["DDPG", "RS", "GPR"]
+print('support optimizers: ', optimizer_names)
+
+optimizer_dict = {"DDPG": DDPG, "RS": RS}
 
 def train(num_episode, agent, env, output, debug=False):
     # best record
@@ -125,9 +130,9 @@ def train(num_episode, agent, env, output, debug=False):
 
             text_writer.write('best reward: {}\n'.format(best_reward))
             text_writer.write('best policy: {}\n'.format(best_policy))
+
     text_writer.close()
     return best_policy, best_reward
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='PyTorch Reinforcement Learning')
@@ -180,7 +185,9 @@ if __name__ == "__main__":
     parser.add_argument('--resume', default='default', type=str, help='Resuming model path for testing')
     # Architecture
     parser.add_argument('--arch', '-a', metavar='ARCH', default='mobilenet_v2', choices=model_names,
-                    help='model architecture:' + ' | '.join(model_names) + ' (default: mobilenet_v2)')
+                        help='model architecture:' + ' | '.join(model_names) + ' (default: mobilenet_v2)')
+    parser.add_argument('--optimizer', default = "DDPG", choices = optimizer_names,
+                        help = "optimizers:" + " | ".join(optimizer_names) + " (default: DDPG)")
     # device options
     parser.add_argument('--gpu_id', default='1', type=str,
                         help='id(s) for CUDA_VISIBLE_DEVICES')
@@ -221,7 +228,7 @@ if __name__ == "__main__":
     nb_actions = 1  # actions for weight and activation quantization
     args.rmsize = args.rmsize * len(env.quantizable_idx)  # for each layer
     print('** Actual replay buffer size: {}'.format(args.rmsize))
-    agent = DDPG(nb_states, nb_actions, args)
+    agent = optimizer_dict[args.optimizer](nb_states, nb_actions, args)
 
     best_policy, best_reward = train(args.train_episode, agent, env, args.output, debug=args.debug)
     print('best_reward: ', best_reward)

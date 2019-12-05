@@ -3,8 +3,8 @@ python -W ignore rl_quantize.py \
  --dataset imagenet             \
  --suffix ratio010              \
  --preserve_ratio 0.1           \
- --n_worker 4                  \
+ --n_worker 2                   \
  --data_bsize 256               \
- --no-finetune \
- --val_size 49900               \
- --gpu_id 0,1,2,3               \
+ --no-finetune                  \
+ --optimizer RS                 \
+ --val_size 49800
