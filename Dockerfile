@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
          libpng-dev && \
      rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install torch torchvision
+RUN pip3 install setuptools torch torchvision
 
 RUN git clone https://github.com/phrb/haq-release.git
 RUN cd haq-release && git checkout quantization-sampling && ./run/setup.sh && cd ..
