@@ -1,6 +1,7 @@
 python3 -W ignore rl_quantize.py \
  --arch resnet50                \
  --dataset imagenet             \
+ --dataset_root data            \
  --suffix ratio010              \
  --preserve_ratio 0.1           \
  --n_worker 2                   \

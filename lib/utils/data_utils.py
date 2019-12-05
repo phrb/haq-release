@@ -14,7 +14,7 @@ import torchvision.datasets as datasets
 from torch.utils.data.sampler import SubsetRandomSampler
 
 
-def get_dataset(dataset_name, batch_size, n_worker, data_root='data', for_inception=False):
+def get_dataset(dataset_name, batch_size, n_worker, data_root='data/imagenet', for_inception=False):
     print('==> Preparing data..')
     if dataset_name == 'imagenet':
         traindir = os.path.join(data_root, 'train')
