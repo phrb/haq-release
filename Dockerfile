@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN pip3 install torch torchvision
 
-RUN git clone https://github.com/phrb/haq-release.git --depth=1
+RUN git clone https://github.com/phrb/haq-release.git
 RUN cd haq-release && git checkout quantization-sampling && cd ..
 
 ENV http_proxy "http://web-proxy-pa.labs.hpecorp.net:8088/"

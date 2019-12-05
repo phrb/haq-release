@@ -18,6 +18,8 @@ fi
 PROXY_URL=http://web-proxy-pa.labs.hpecorp.net:8088/
 SRC_DIR=/shared/bruelp/imagenet
 TARGET_DIR=/haq-release/data
+IMAGE=haq-sampling:latest
+CONTAINER=haq-test
 
 while test $# -gt 0
 do
@@ -25,15 +27,22 @@ do
         -b|--build)
             sudo docker build \
                  -t haq-sampling:latest \
-                 --build-arg=http_proxy=$proxy_url \
-                 --build-arg=https_proxy=$proxy_url .
+                 --build-arg=http_proxy=$PROXY_URL \
+                 --build-arg=https_proxy=$PROXY_URL .
             ;;
         -r|--run)
             sudo docker run -d \
                  -it \
-                 --name haq-test \
+                 --name $CONTAINER \
                  --mount type=bind,source=$SRC_DIR,target=$TARGET_DIR \
-                 haq-sampling:latest
+                 $IMAGE
+            sudo docker exec -it $CONTAINER /bin/bash
+            ;;
+        -s|--stop)
+            sudo docker container stop $CONTAINER
+            ;;
+        -rm|--remove)
+            sudo docker container rm $CONTAINER
             ;;
         -p|--pull)
             git pull

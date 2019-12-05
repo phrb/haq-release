@@ -1,4 +1,4 @@
-python -W ignore rl_quantize.py \
+python3 -W ignore rl_quantize.py \
  --arch resnet50                \
  --dataset imagenet             \
  --suffix ratio010              \
