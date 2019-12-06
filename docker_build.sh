@@ -5,7 +5,8 @@ set -e
 function usage() {
     echo "Usage: ./docker_build.sh [OPTION]"
     echo "  -b, --build       Builds the docker image"
-    echo "  -r, --run         Launches a container, gets a shell"
+    echo "  -r, --run         Starts a container, gets a shell"
+    echo "  -l, --launch      Launches a container, gets a shell"
     echo "  -c, --configure   Configure repository for experiments"
     echo "  --help            Print this message"
     exit 0
@@ -40,6 +41,9 @@ do
                  --mount type=bind,source=$SRC_DIR,target=$TARGET_DIR \
                  --mount type=bind,source=$REPO_SRC_DIR,target=$REPO_TARGET_DIR \
                  $IMAGE
+            sudo docker exec -it $CONTAINER /bin/bash
+            ;;
+        -l|--launch)
             sudo docker exec -it $CONTAINER /bin/bash
             ;;
         -s|--stop)
