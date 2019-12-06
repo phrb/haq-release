@@ -26,7 +26,7 @@ class RS(object):
         self.current_column = 0
         self.current_row = 0
 
-        self.past_episode = 0
+        self.episode_end = False
 
         self.current_action = float("inf")
 
@@ -46,21 +46,27 @@ class RS(object):
         self.current_action = self.design.iat[self.current_row, self.current_column]
 
         self.current_column += 1
-        if self.current_column >= self.design.shape[1]:
+        if self.current_column >= self.design.shape[1] - 1:
             self.current_column = 0
             self.current_row += 1
 
+        print("acting on row: {0} col: {1}".format(self.current_row, self.current_column))
         return self.current_action
 
     def select_action(self, s_t, episode, decay_epsilon = True):
-        if episode != 0 and episode == self.past_episode:
+        print("episode: {0}".format(episode))
+        if self.episode_end:
+            self.episode_end = False
             return self.current_action
         else:
             self.past_episode = episode
             return self.random_action()
 
     def save_accuracy(self, accuracy):
-        self.design.at[(self.current_row - 1), "Accuracy"] = accuracy
+        print("saving row: {0} col: {1}".format(self.current_row, self.current_column))
+
+        self.episode_end = True
+        self.design.at[self.current_row, "Accuracy"] = accuracy
         self.design.to_csv("sobol_resnet50_600_samples_results.csv", index = False)
 
     def reset(self, obs):

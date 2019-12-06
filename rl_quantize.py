@@ -81,6 +81,7 @@ def train(num_episode, agent, env, output, debug=False):
         if done:  # end of episode
             if args.optimizer == "RS":
                 agent.save_accuracy(info['accuracy'])
+                agent.episode_end = True
 
             if debug:
                 print('#{}: episode_reward:{:.4f} acc: {:.4f}, weight: {:.4f} MB'.format(episode, episode_reward,

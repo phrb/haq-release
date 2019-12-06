@@ -5,7 +5,7 @@ python3 -W ignore rl_quantize.py \
  --suffix ratio010               \
  --preserve_ratio 0.1            \
  --n_worker 120                  \
- --warmup 0                      \
+ --warmup -1                     \
  --data_bsize 512                \
  --no-finetune                   \
  --optimizer RS                  \
