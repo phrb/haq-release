@@ -60,7 +60,7 @@ class RS(object):
             return self.random_action()
 
     def save_accuracy(self, accuracy):
-        self.design[self.current_row - 1, "Accuracy"] = accuracy
+        self.design.at[(self.current_row - 1), "Accuracy"] = accuracy
         self.design.to_csv("sobol_resnet50_600_samples_results.csv")
 
     def reset(self, obs):
