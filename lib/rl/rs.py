@@ -66,7 +66,7 @@ class RS(object):
         print("saving row: {0} col: {1}".format(self.current_row, self.current_column))
 
         self.episode_end = True
-        self.design.at[self.current_row, "Accuracy"] = accuracy
+        self.design.at[self.current_row - 1, "Accuracy"] = accuracy
         self.design.to_csv("sobol_resnet50_600_samples_results.csv", index = False)
 
     def reset(self, obs):
