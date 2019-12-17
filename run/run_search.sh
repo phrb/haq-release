@@ -6,6 +6,7 @@ python3 -W ignore rl_quantize.py \
  --preserve_ratio 0.1            \
  --n_worker 120                  \
  --warmup -1                     \
+ --train_episode 3000            \
  --data_bsize 512                \
  --no-finetune                   \
  --optimizer RS                  \
