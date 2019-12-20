@@ -67,8 +67,8 @@ class RS(object):
         print("saving row: {0} col: {1}".format(self.current_row, self.current_column))
 
         self.episode_end = True
-        self.design.at[self.current_row - 1, "Top1"] = top1
-        self.design.at[self.current_row - 1, "Top5"] = top5
+        self.design.at[self.current_row, "Top1"] = top1
+        self.design.at[self.current_row, "Top5"] = top5
         self.design.to_csv("sobol_resnet50_600_samples_results.csv", index = False)
 
     def reset(self, obs):
