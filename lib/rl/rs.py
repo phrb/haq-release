@@ -20,8 +20,9 @@ class RS(object):
         self.memory = SequentialMemory(limit = args.rmsize,
                                        window_length = args.window_length)
 
-        self.design = pd.read_csv("experimental_designs/sobol_resnet50_3000_samples.csv")
-        self.design["Accuracy"] = float("inf")
+        self.design = pd.read_csv("experimental_designs/sobol_resnet50_600_samples.csv")
+        self.design["Top1"] = float("inf")
+        self.design["Top5"] = float("inf")
 
         self.current_column = 0
         self.current_row = 0
@@ -62,11 +63,12 @@ class RS(object):
             self.past_episode = episode
             return self.random_action()
 
-    def save_accuracy(self, accuracy):
+    def save_accuracy(self, top1, top5):
         print("saving row: {0} col: {1}".format(self.current_row, self.current_column))
 
         self.episode_end = True
-        self.design.at[self.current_row - 1, "Accuracy"] = accuracy
+        self.design.at[self.current_row - 1, "Top1"] = top1
+        self.design.at[self.current_row - 1, "Top5"] = top5
         self.design.to_csv("sobol_resnet50_600_samples_results.csv", index = False)
 
     def reset(self, obs):

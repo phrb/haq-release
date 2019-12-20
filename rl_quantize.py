@@ -80,7 +80,7 @@ def train(num_episode, agent, env, output, debug=False):
 
         if done:  # end of episode
             if args.optimizer == "RS":
-                agent.save_accuracy(info['accuracy'])
+                agent.save_accuracy(info["top1"], info["top5"])
                 agent.episode_end = True
 
             if debug:

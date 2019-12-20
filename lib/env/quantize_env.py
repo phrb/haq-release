@@ -72,7 +72,9 @@ class QuantizeEnv:
         self.n_quantizable_layer = len(self.quantizable_idx)
 
         self.model.load_state_dict(self.pretrained_model, strict=True)
-        self.org_acc = self._validate(self.val_loader, self.model)
+
+        top_accs = self._validate(self.val_loader, self.model)
+        self.org_acc = top_accs["top1"]
         # build embedding (static part), same as pruning
         self._build_state_embedding()
 
@@ -106,14 +108,20 @@ class QuantizeEnv:
             if self.finetune_flag:
                 train_acc = self._kmeans_finetune(self.train_loader, self.model, self.quantizable_idx,
                                                   centroid_label_dict, epochs=self.finetune_epoch, verbose=False)
-                acc = self._validate(self.val_loader, self.model)
+                top_accs = self._validate(self.val_loader, self.model)
+                acc = top_accs["top1"]
             else:
-                acc = self._validate(self.val_loader, self.model)
+                top_accs = self._validate(self.val_loader, self.model)
+                acc = top_accs["top1"]
 
             # reward = self.reward(acc, w_size_ratio)
             reward = self.reward(acc)
 
-            info_set = {'w_ratio': w_size_ratio, 'accuracy': acc, 'w_size': w_size}
+            info_set = {'w_ratio': w_size_ratio,
+                        'accuracy': acc,
+                        'top1': top_accs['top1'],
+                        'top5': top_accs['top5'],
+                        'w_size': w_size}
 
             if reward > self.best_reward:
                 self.best_reward = reward
@@ -194,7 +202,7 @@ class QuantizeEnv:
         return org_weight
 
     def _init_data(self):
-        self.train_loader, self.val_loader, n_class = get_split_val_dataset(
+        self.train_loader, self.val_loader, n_class = get_split_train_dataset(
             self.data_type, self.batch_size, self.n_data_worker, data_root=self.data_root,
             val_size=self.val_size, train_size=self.train_size, for_inception=self.is_inception)
 
@@ -400,7 +408,10 @@ class QuantizeEnv:
         t2 = time.time()
         if verbose:
             print('* Test loss: %.3f  top1: %.3f  top5: %.3f  time: %.3f' % (losses.avg, top1.avg, top5.avg, t2-t1))
-        if self.use_top5:
-            return top5.avg
-        else:
-            return top1.avg
+
+        # if self.use_top5:
+        #     return top5.avg
+        # else:
+        #     return top1.avg
+
+        return {"top1": top1.avg, "top5": top5.avg}

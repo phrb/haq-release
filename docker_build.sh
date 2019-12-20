@@ -43,6 +43,17 @@ do
                  $IMAGE
             sudo docker exec -it $CONTAINER /bin/bash
             ;;
+        -rr|--random-run)
+            NAME=$CONTAINER-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 5 | head -n 1)
+            sudo docker run -d \
+                 --ipc=host \
+                 -it \
+                 --name $NAME \
+                 --mount type=bind,source=$SRC_DIR,target=$TARGET_DIR \
+                 --mount type=bind,source=$REPO_SRC_DIR,target=$REPO_TARGET_DIR \
+                 $IMAGE
+            sudo docker exec -it $NAME /bin/bash
+            ;;
         -l|--launch)
             sudo docker exec -it $CONTAINER /bin/bash
             ;;
