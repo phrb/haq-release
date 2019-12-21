@@ -91,7 +91,12 @@ class QuantizeEnv:
 
     def step(self, action):
         # Pseudo prune and get the corresponding statistics. The real pruning happens till the end of all pseudo pruning
-        action = self._action_wall(action)  # percentage to preserve
+        if type(action) == list:
+            assert len(action) == 2
+            action = [self._action_wall(action[0]),
+                      self._action_wall(action[1])]
+        else:
+            action = self._action_wall(action)  # percentage to preserve
 
         self.strategy.append(action)  # save action to strategy
 
