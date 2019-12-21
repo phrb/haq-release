@@ -44,9 +44,10 @@ class RS(object):
         pass
 
     def random_action(self):
-        self.current_action = self.design.iat[self.current_row, self.current_column]
+        self.current_action = [self.design.iat[self.current_row, self.current_column],
+                               self.design.iat[self.current_row, self.current_column + 1]]
 
-        self.current_column += 1
+        self.current_column += 2
         if self.current_column >= self.design.shape[1] - 2:
             self.current_column = 0
             self.current_row += 1
