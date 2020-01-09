@@ -142,7 +142,11 @@ class QuantizeEnv:
         reward = 0
         done = False
         self.cur_ind += 1  # the index of next layer
-        self.layer_embedding[self.cur_ind][-1] = action
+        if type(action) == list:
+            self.layer_embedding[self.cur_ind][-1] = action[0]
+        else:
+            self.layer_embedding[self.cur_ind][-1] = action
+
         # build next state (in-place modify)
         obs = self.layer_embedding[self.cur_ind, :].copy()
         return obs, reward, done, info_set
@@ -172,10 +176,16 @@ class QuantizeEnv:
             min_weight += self.wsize_list[i] * self.min_bit
         while min_weight < self._cur_weight() and target < self._cur_weight():
             for i, n_bit in enumerate(reversed(self.strategy)):
-                if n_bit > self.min_bit:
-                    self.strategy[-(i+1)] -= 1
+                if type(n_bit) == list:
+                    if n_bit[0] > self.min_bit:
+                        self.strategy[-(i+1)][0] -= 1
+                else:
+                    if n_bit > self.min_bit:
+                        self.strategy[-(i+1)] -= 1
+
                 if target >= self._cur_weight():
                     break
+
         print('=> Final action list: {}'.format(self.strategy))
 
     def _action_wall(self, action):
@@ -193,7 +203,12 @@ class QuantizeEnv:
         cur_weight = 0.
         # quantized
         for i, n_bit in enumerate(self.strategy):
-            cur_weight += n_bit * self.wsize_list[i]
+            if type(n_bit) == list:
+                bit = n_bit[0]
+            else:
+                bit = n_bit
+
+            cur_weight += bit * self.wsize_list[i]
         return cur_weight
 
     def _cur_reduced(self):

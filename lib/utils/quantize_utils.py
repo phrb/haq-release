@@ -47,7 +47,7 @@ def quantize_model(model, quantize_index, quantize_bits, max_iter=50, mode='cpu'
             continue
         this_cl_list = []
         n_bit = quantize_layer_bit_dict[i]
-        if n_bit < 0:  # if -1, do not quantize
+        if type(n_bit) != list and n_bit < 0:  # if -1, do not quantize
             continue
         if type(n_bit) == list:  # given both the bit of weight and bias
             assert len(n_bit) == 2
@@ -108,5 +108,3 @@ def kmeans_update_model(model, quantizable_idx, centroid_label_dict, free_high_b
             mask_cl = (this_cl_list[0][1] == j).float()
             new_weight_data += (layer.weight.data * mask_cl).sum() / mask_cl.sum() * mask_cl
         layer.weight.data = new_weight_data
-
-

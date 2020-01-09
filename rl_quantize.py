@@ -130,7 +130,7 @@ def train(num_episode, agent, env, output, debug=False):
             tfwriter.add_scalar('delta', delta, episode)
             # record the preserve rate for each layer
             for i, preserve_rate in enumerate(env.strategy):
-                tfwriter.add_scalar('preserve_rate_w/{}'.format(i), preserve_rate, episode)
+                tfwriter.add_scalar('preserve_rate_w/{}'.format(i), preserve_rate[0], episode)
 
             text_writer.write('best reward: {}\n'.format(best_reward))
             text_writer.write('best policy: {}\n'.format(best_policy))
