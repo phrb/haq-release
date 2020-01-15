@@ -20,7 +20,8 @@ class RS(object):
         self.memory = SequentialMemory(limit = args.rmsize,
                                        window_length = args.window_length)
 
-        self.design = pd.read_csv("experimental_designs/sobol_resnet50_600_samples.csv")
+        # self.design = pd.read_csv("experimental_designs/sobol_resnet50_600_samples.csv")
+        self.design = pd.read_csv("experimental_designs/sobol_resnet50_weight_activation_3000_samples.csv")
         self.design["Top1"] = float("inf")
         self.design["Top5"] = float("inf")
 
