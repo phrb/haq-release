@@ -21,7 +21,7 @@ class RS(object):
                                        window_length = args.window_length)
 
         # self.design = pd.read_csv("experimental_designs/sobol_resnet50_600_samples.csv")
-        self.design = pd.read_csv("experimental_designs/sobol_resnet50_weight_activation_3000_samples.csv")
+        self.design = pd.read_csv("current_design.csv")
         self.design["Top1"] = float("inf")
         self.design["Top5"] = float("inf")
 
@@ -71,7 +71,7 @@ class RS(object):
         self.episode_end = True
         self.design.at[self.current_row - 1, "Top1"] = top1
         self.design.at[self.current_row - 1, "Top5"] = top5
-        self.design.to_csv("sobol_resnet50_600_samples_results.csv", index = False)
+        self.design.to_csv("current_results.csv", index = False)
 
     def reset(self, obs):
         pass
