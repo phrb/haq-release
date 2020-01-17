@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
          ca-certificates                                         \
          libjpeg-dev                                             \
          libpng-dev                                              \
+         liblapack-dev                                           \
+         libopenblas-dev                                         \
          r-base &&                                               \
      rm -rf /var/lib/apt/lists/*
 
