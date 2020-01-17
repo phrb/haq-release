@@ -12,8 +12,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
          curl                                                    \
          ca-certificates                                         \
          libjpeg-dev                                             \
-         libpng-dev &&                                           \
+         libpng-dev
+         r-base &&                                           \
      rm -rf /var/lib/apt/lists/*
+
+RUN Rscript -e 'install.packages(c("rsm", "dplyr", "DiceKriging", "DiceDesign", "DiceOptim","randtoolbox"), repos="https://cran.rstudio.com")'
 
 RUN pip3 install               \
         'torch>=1.1'           \
