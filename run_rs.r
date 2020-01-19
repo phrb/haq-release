@@ -14,7 +14,7 @@ search_space <- NULL
 results <- NULL
 
 sobol_dim <- 54 * 2
-starting_sobol_n <- 3 * sobol_dim
+starting_sobol_n <- 0.25 * sobol_dim
 
 sobol_n <- starting_sobol_n
 
