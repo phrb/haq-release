@@ -69,15 +69,15 @@ for(i in 1:iterations){
 
     current_results <- read.csv("current_results.csv", header = TRUE)
 
-    best_points <- filter(search_space, Top1 == min(Top1) | Top5 == min(Top5))
-    best_points$id <- i
-    best_points$elapsed <- elapsed_time
-
     if(is.null(search_space)){
         search_space <- current_results
     } else{
         search_space <- bind_rows(search_space, current_results)
     }
+
+    best_points <- filter(search_space, Top1 == min(Top1) | Top5 == min(Top5))
+    best_points$id <- i
+    best_points$elapsed <- elapsed_time
 
     if(is.null(results)){
         results <- best_points
