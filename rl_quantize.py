@@ -69,8 +69,8 @@ def train(num_episode, agent, env, output, debug=False):
         T.append([reward, deepcopy(observation), deepcopy(observation2), action, done])
 
         # [optional] save intermideate model
-        if episode % int(num_episode / 10) == 0:
-            agent.save_model(output)
+        # if episode % int(num_episode / 10) == 0:
+        #     agent.save_model(output)
 
         # update
         step += 1
