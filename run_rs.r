@@ -8,30 +8,29 @@ quiet <- function(x) {
   invisible(force(x))
 }
 
-iterations <- 1
+iterations <- 10
 
 search_space <- NULL
 results <- NULL
 
 sobol_dim <- 54 * 2
-#starting_sobol_n <- 0.25 * sobol_dim
-starting_sobol_n <- 3
+starting_sobol_n <- 2 * sobol_dim
 
 sobol_n <- starting_sobol_n
 
 bit_min <- 1
 bit_max <- 8
 
-temp_sobol <- sobol(n = sobol_n,
-                    dim = sobol_dim,
-                    scrambling = 3,
-                    seed = as.integer((99999 - 10000) * runif(1) + 10000),
-                    init = TRUE)
-
-rm(temp_sobol)
-quiet(gc())
-
 for(i in 1:iterations){
+    temp_sobol <- sobol(n = sobol_n,
+                        dim = sobol_dim,
+                        scrambling = 3,
+                        seed = as.integer((99999 - 10000) * runif(1) + 10000),
+                        init = TRUE)
+
+    rm(temp_sobol)
+    quiet(gc())
+
     design <- sobol(n = sobol_n,
                     dim = sobol_dim,
                     scrambling = 3,
@@ -78,6 +77,7 @@ for(i in 1:iterations){
     best_points <- filter(search_space, Top1 == min(Top1) | Top5 == min(Top5))
     best_points$id <- i
     best_points$elapsed <- elapsed_time
+    best_points$points <- sobol_n
 
     if(is.null(results)){
         results <- best_points
