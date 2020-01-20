@@ -15,7 +15,7 @@ results <- NULL
 
 sobol_dim <- 54 * 2
 #starting_sobol_n <- 0.25 * sobol_dim
-starting_sobol_n <- 8
+starting_sobol_n <- 3
 
 sobol_n <- starting_sobol_n
 
@@ -85,12 +85,12 @@ for(i in 1:iterations){
         results <- bind_rows(results, best_points)
     }
 
-    write(results,
-          paste("rs_",
-                starting_sobol_n,
-                "_samples_",
-                i,
-                "_iterations.csv",
-                sep = ""),
-          row.names = FALSE)
+    write.csv(results,
+              paste("rs_",
+                    starting_sobol_n,
+                    "_samples_",
+                    i,
+                    "_iterations.csv",
+                    sep = ""),
+              row.names = FALSE)
 }
