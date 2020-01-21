@@ -74,9 +74,9 @@ for(i in 1:iterations){
         search_space <- bind_rows(search_space, current_results)
     }
 
-    best_points <- filter(search_space, Top1 == min(Top1) | Top5 == min(Top5))
+    best_points <- filter(search_space, Top1 == max(Top1) | Top5 == max(Top5))
     best_points$id <- i
-    best_points$elapsed <- elapsed_time
+    best_points$elapsed_seconds <- elapsed_time
     best_points$points <- sobol_n
 
     if(is.null(results)){
@@ -89,7 +89,7 @@ for(i in 1:iterations){
               paste("rs_",
                     starting_sobol_n,
                     "_samples_",
-                    i,
+                    iterations,
                     "_iterations.csv",
                     sep = ""),
               row.names = FALSE)
