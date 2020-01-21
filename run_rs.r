@@ -68,13 +68,7 @@ for(i in 1:iterations){
 
     current_results <- read.csv("current_results.csv", header = TRUE)
 
-    if(is.null(search_space)){
-        search_space <- current_results
-    } else{
-        search_space <- bind_rows(search_space, current_results)
-    }
-
-    best_points <- filter(search_space, Top1 == max(Top1) | Top5 == max(Top5))
+    best_points <- filter(current_results, Top1 == max(Top1) | Top5 == max(Top5))
     best_points$id <- i
     best_points$elapsed_seconds <- elapsed_time
     best_points$points <- sobol_n
@@ -85,12 +79,28 @@ for(i in 1:iterations){
         results <- bind_rows(results, best_points)
     }
 
+    if(is.null(search_space)){
+        search_space <- current_results
+    } else{
+        search_space <- bind_rows(search_space, current_results)
+    }
+
     write.csv(results,
               paste("rs_",
                     starting_sobol_n,
                     "_samples_",
                     iterations,
                     "_iterations.csv",
+                    sep = ""),
+              row.names = FALSE)
+
+
+    write.csv(search_space,
+              paste("rs_",
+                    starting_sobol_n,
+                    "_samples_",
+                    iterations,
+                    "_iterations_search_space.csv",
                     sep = ""),
               row.names = FALSE)
 }
