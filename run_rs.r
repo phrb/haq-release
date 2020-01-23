@@ -52,7 +52,7 @@ for(i in 1:iterations){
 
     write.csv(coded_df_design, "current_design.csv", row.names = FALSE)
 
-    start_time <- Sys.time()
+    start_time <- as.integer(format(Sys.time(), "%s"))
 
     cmd <- paste("python3 -W ignore rl_quantize.py --arch resnet50 --dataset imagenet --dataset_root data",
                  " --suffix ratio010 --preserve_ratio 0.1 --n_worker 120 --warmup -1 --train_episode ",
@@ -64,7 +64,7 @@ for(i in 1:iterations){
 
     system(cmd)
 
-    elapsed_time <- round((Sys.time() - start_time)[[1]] * 60)
+    elapsed_time <- as.integer(format(Sys.time(), "%s")) - start_time
 
     current_results <- read.csv("current_results.csv", header = TRUE)
 
