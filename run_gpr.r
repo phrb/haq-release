@@ -147,7 +147,7 @@ for(i in 1:iterations){
 
         perturbation <- data.frame(perturbation)
 
-        names(pertubation) <- c(rbind(paste("W",
+        names(perturbation) <- c(rbind(paste("W",
                                             seq(1:(sobol_dim / 2)),
                                             sep = ""),
                                       paste("A",
