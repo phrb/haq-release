@@ -87,7 +87,7 @@ for(i in 1:iterations){
     }
 
     write.csv(search_space,
-              paste("rs_",
+              paste("gpr_",
                     total_measurements,
                     "_samples_",
                     i,
@@ -109,6 +109,15 @@ for(i in 1:iterations){
                             scrambling = 3,
                             seed = as.integer((99999 - 10000) * runif(1) + 10000),
                             init = FALSE)
+
+        new_sample <- data.frame(new_sample)
+
+        names(new_sample) <- c(rbind(paste("W",
+                                           seq(1:(sobol_dim / 2)),
+                                           sep = ""),
+                                     paste("A",
+                                           seq(1:(sobol_dim / 2)),
+                                           sep = "")))
 
         if(is.null(gpr_sample)){
             gpr_sample <- new_sample
@@ -135,6 +144,15 @@ for(i in 1:iterations){
                               scrambling = 3,
                               seed = as.integer((99999 - 10000) * runif(1) + 10000),
                               init = FALSE)
+
+        perturbation <- data.frame(perturbation)
+
+        names(pertubation) <- c(rbind(paste("W",
+                                            seq(1:(sobol_dim / 2)),
+                                            sep = ""),
+                                      paste("A",
+                                            seq(1:(sobol_dim / 2)),
+                                            sep = "")))
 
         perturbation <- (2 * perturbation_range * perturbation) - perturbation_range
 
@@ -188,7 +206,7 @@ for(i in 1:iterations){
         }
 
         write.csv(search_space,
-                  paste("rs_",
+                  paste("gpr_",
                         total_measurements,
                         "_samples_",
                         i,
@@ -219,7 +237,7 @@ for(i in 1:iterations){
     }
 
     write.csv(results,
-              paste("rs_",
+              paste("gpr_",
                     total_measurements,
                     "_samples_",
                     iterations,
