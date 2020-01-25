@@ -157,7 +157,12 @@ for(i in 1:iterations){
         gpr_selected_points <- gpr_selected_points %>%
             slice(rep(row_number(), gpr_neighbourhood_factor))
 
-        gpr_selected_points <- gpr_selected_points * perturbation %>%
+        gpr_selected_points <- gpr_selected_points * perturbation
+
+        gpr_selected_points[gpr_selected_points < 0.0] <- 0.0
+        gpr_selected_points[gpr_selected_points > 1.0] <- 1.0
+
+        gpr_selected_points <- gpr_selected_points %>%
             distinct()
 
         print("Computing perturbed EI")
