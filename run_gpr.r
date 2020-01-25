@@ -1,8 +1,8 @@
 library(randtoolbox)
 library(dplyr)
+library(rsm)
 library(DiceKriging)
 library(DiceOptim)
-library(rsm)
 
 quiet <- function(x) {
   sink(tempfile())
@@ -10,55 +10,209 @@ quiet <- function(x) {
   invisible(force(x))
 }
 
-starting_sobol_n <- 216
+iterations <- 10
 
-sobol_n <- 3000
+results <- NULL
+
 sobol_dim <- 54 * 2
+starting_sobol_n <- (1 * sobol_dim) + 2
+sobol_n <- starting_sobol_n
+
 bit_min <- 1
 bit_max <- 8
+perturbation_range <- 2 * (bit_min / bit_max)
 
-temp_sobol <- sobol(n = sobol_n,
+gpr_iterations <- 10
+gpr_added_points <- 2
+gpr_neighbourhood_factor <- 1000
+
+gpr_sample_size <- sobol_dim * 10000
+
+total_measurements <- starting_sobol_n + (gpr_iterations * gpr_added_points)
+
+for(i in 1:iterations){
+    gpr_sample <- NULL
+    search_space <- NULL
+
+    temp_sobol <- sobol(n = sobol_n,
+                        dim = sobol_dim,
+                        scrambling = 3,
+                        seed = as.integer((99999 - 10000) * runif(1) + 10000),
+                        init = TRUE)
+
+    rm(temp_sobol)
+    quiet(gc())
+
+    design <- sobol(n = sobol_n,
                     dim = sobol_dim,
                     scrambling = 3,
                     seed = as.integer((99999 - 10000) * runif(1) + 10000),
-                    init = TRUE)
+                    init = FALSE)
 
-rm(temp_sobol)
-quiet(gc())
+    df_design <- data.frame(design)
 
-design <- sobol(n = sobol_n,
-                dim = sobol_dim,
-                scrambling = 3,
-                seed = as.integer((99999 - 10000) * runif(1) + 10000),
-                init = FALSE)
+    names(df_design) <- c(rbind(paste("W",
+                                      seq(1:(sobol_dim / 2)),
+                                      sep = ""),
+                                paste("A",
+                                      seq(1:(sobol_dim / 2)),
+                                      sep = "")))
 
-df_design <- data.frame(design)
+    write.csv(df_design, "current_design.csv", row.names = FALSE)
 
-names(df_design) <- c(rbind(paste("W", seq(1:(sobol_dim / 2)), sep = ""), paste("A", seq(1:(sobol_dim / 2)), sep = "")))
+    start_time <- as.integer(format(Sys.time(), "%s"))
 
-formulas <- character(length(names(df_design)))
+    cmd <- paste("python3 -W ignore rl_quantize.py --arch resnet50",
+                 " --dataset imagenet --dataset_root data",
+                 " --suffix ratio010 --preserve_ratio 0.1",
+                 " --n_worker 120 --warmup -1 --train_episode ",
+                 sobol_n,
+                 " --data_bsize 128 --optimizer RS --val_size 10000",
+                 " --train_size 20000",
+                 sep = "")
 
-for(i in 1:length(names(df_design))){
-  formulas[i] <- paste(names(df_design)[i],
-                       "e ~ round((",
-                       bit_max - bit_min,
-                       " * ",
-                       names(df_design)[i],
-                       ") + ",
-                       bit_min,
-                       ")",
-                       sep = "")
+    print(cmd)
+    system(cmd)
+
+    current_results <- read.csv("current_results.csv", header = TRUE)
+
+    if(is.null(search_space)){
+        search_space <- current_results
+    } else{
+        search_space <- bind_rows(search_space, current_results) %>%
+            distinct()
+    }
+
+    write.csv(search_space,
+              paste("rs_",
+                    total_measurements,
+                    "_samples_",
+                    i,
+                    "_iteration_search_space.csv",
+                    sep = ""),
+              row.names = FALSE)
+
+    for(j in 1:gpr_iterations){
+        # Optimzing for Top5
+        gpr_model <- km(design = select(search_space, -Top5, -Top1),
+                        response = search_space$Top5,
+                        control = list(pop.size = 400,
+                                       BFGSburnin = 500))
+
+        new_sample <- sobol(n = gpr_sample_size,
+                            dim = sobol_dim,
+                            scrambling = 3,
+                            seed = as.integer((99999 - 10000) * runif(1) + 10000),
+                            init = FALSE)
+
+        if(is.null(gpr_sample)){
+            gpr_sample <- new_sample
+        } else{
+            gpr_sample <- bind_rows(gpr_sample, new_sample) %>%
+                distinct()
+        }
+
+        gpr_sample$expected_improvement <- apply(gpr_sample, 1, EI, gpr_model)
+
+        gpr_selected_points <- gpr_sample %>%
+            arrange(desc(expected_improvement))
+
+        gpr_selected_points <- select(gpr_selected_points[1:gpr_added_points, ],
+                                      -expected_improvement)
+
+        perturbation <- sobol(n = gpr_added_points * gpr_neighbourhood_factor,
+                              dim = sobol_dim,
+                              scrambling = 3,
+                              seed = as.integer((99999 - 10000) * runif(1) + 10000),
+                              init = FALSE)
+
+        perturbation <- (2 * perturbation_range * perturbation) - perturbation_range
+
+        gpr_selected_points <- gpr_selected_points %>%
+            slice(rep(row_number(), gpr_neighbourhood_factor))
+
+        gpr_selected_points <- gpr_selected_points * perturbation %>%
+            distinct()
+
+        gpr_selected_points$expected_improvement <- apply(gpr_selected_points,
+                                                          1,
+                                                          EI,
+                                                          gpr_model)
+
+        gpr_selected_points <- gpr_selected_points %>%
+            arrange(desc(expected_improvement))
+
+        gpr_selected_points <- select(gpr_selected_points[1:gpr_added_points, ],
+                                      -expected_improvement)
+
+        df_design <- data.frame(gpr_selected_points)
+        names(df_design) <- c(rbind(paste("W",
+                                          seq(1:(sobol_dim / 2)),
+                                          sep = ""),
+                                    paste("A",
+                                          seq(1:(sobol_dim / 2)),
+                                          sep = "")))
+
+        write.csv(df_design, "current_design.csv", row.names = FALSE)
+
+        cmd <- paste("python3 -W ignore rl_quantize.py --arch resnet50",
+                     " --dataset imagenet --dataset_root data",
+                     " --suffix ratio010 --preserve_ratio 0.1",
+                     " --n_worker 120 --warmup -1 --train_episode ",
+                     gpr_added_points,
+                     " --data_bsize 128 --optimizer RS --val_size 10000",
+                     " --train_size 20000",
+                     sep = "")
+
+        print(cmd)
+        system(cmd)
+
+        current_results <- read.csv("current_results.csv", header = TRUE)
+
+        if(is.null(search_space)){
+            search_space <- current_results
+        } else{
+            search_space <- bind_rows(search_space, current_results) %>%
+                distinct()
+        }
+
+        write.csv(search_space,
+                  paste("rs_",
+                        total_measurements,
+                        "_samples_",
+                        i,
+                        "_iteration_search_space.csv",
+                        sep = ""),
+                  row.names = FALSE)
+    }
+
+    elapsed_time <- as.integer(format(Sys.time(), "%s")) - start_time
+
+    # Optimizing for Top5 (Top1, Model Size, Latency... ?)
+    best_points <- filter(search_space, Top5 == max(Top5))
+
+    best_points$id <- i
+    best_points$elapsed_seconds <- elapsed_time
+    best_points$points <- total_measurements
+
+    best_points$gpr_iterations <- gpr_iterations
+    best_points$gpr_added_points <- gpr_added_points
+    best_points$perturbation_range <- perturbation_range
+    best_points$gpr_neighbourhood <- gpr_neighbourhood_factor
+    best_points$gpr_sample_size <- gpr_sample_size
+
+    if(is.null(results)){
+        results <- best_points
+    } else{
+        results <- bind_rows(results, best_points)
+    }
+
+    write.csv(results,
+              paste("rs_",
+                    total_measurements,
+                    "_samples_",
+                    iterations,
+                    "_iterations.csv",
+                    sep = ""),
+              row.names = FALSE)
 }
-
-#coded_design <- coded.data(df_design, formulas = lapply(formulas, formula))
-coded_design <- df_design
-
-#coded_df_design <- round(data.frame(coded_design))
-coded_df_design <- data.frame(coded_design)
-
-write.csv(coded_df_design, paste("sobol_resnet50_",
-                                 "weight_activation_",
-                                 sobol_n,
-                                 "_samples.csv",
-                                 sep = ""),
-          row.names = FALSE)
