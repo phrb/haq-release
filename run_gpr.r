@@ -128,8 +128,6 @@ for(i in 1:iterations){
 
         print("Computing EI")
         new_ei <- future_apply(gpr_sample, 1, EI, gpr_model)
-        print(str(new_ei))
-        print(str(gpr_sample))
         gpr_sample$expected_improvement <- new_ei
 
         gpr_selected_points <- gpr_sample %>%
