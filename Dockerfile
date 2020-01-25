@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
          r-base &&                                               \
      rm -rf /var/lib/apt/lists/*
 
-RUN Rscript -e 'install.packages(c("rsm", "dplyr", "DiceKriging", "DiceDesign", "DiceOptim","randtoolbox"), repos="https://cran.rstudio.com")'
+RUN Rscript -e 'install.packages(c("rsm", "dplyr", "DiceKriging", "DiceDesign", "DiceOptim","randtoolbox", "future.apply"), repos="https://cran.rstudio.com")'
 
 RUN pip3 install               \
         'torch>=1.1'           \

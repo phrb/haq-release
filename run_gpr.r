@@ -3,6 +3,9 @@ library(dplyr)
 library(rsm)
 library(DiceKriging)
 library(DiceOptim)
+library(future.apply)
+
+plan(multiprocess, workers = 256)
 
 quiet <- function(x) {
   sink(tempfile())
@@ -23,10 +26,10 @@ bit_max <- 8
 perturbation_range <- 2 * (bit_min / bit_max)
 
 gpr_iterations <- 10
-gpr_added_points <- 2
-gpr_neighbourhood_factor <- 1000
+gpr_added_points <- 5
+gpr_neighbourhood_factor <- 10
 
-gpr_sample_size <- sobol_dim * 10000
+gpr_sample_size <- sobol_dim * 1
 
 total_measurements <- starting_sobol_n + (gpr_iterations * gpr_added_points)
 
@@ -58,21 +61,21 @@ for(i in 1:iterations){
                                       seq(1:(sobol_dim / 2)),
                                       sep = "")))
 
-    write.csv(df_design, "current_design.csv", row.names = FALSE)
+    #write.csv(df_design, "current_design.csv", row.names = FALSE)
 
     start_time <- as.integer(format(Sys.time(), "%s"))
 
-    cmd <- paste("python3 -W ignore rl_quantize.py --arch resnet50",
-                 " --dataset imagenet --dataset_root data",
-                 " --suffix ratio010 --preserve_ratio 0.1",
-                 " --n_worker 120 --warmup -1 --train_episode ",
-                 sobol_n,
-                 " --data_bsize 128 --optimizer RS --val_size 10000",
-                 " --train_size 20000",
-                 sep = "")
+    # cmd <- paste("python3 -W ignore rl_quantize.py --arch resnet50",
+    #              " --dataset imagenet --dataset_root data",
+    #              " --suffix ratio010 --preserve_ratio 0.1",
+    #              " --n_worker 120 --warmup -1 --train_episode ",
+    #              sobol_n,
+    #              " --data_bsize 128 --optimizer RS --val_size 10000",
+    #              " --train_size 20000",
+    #              sep = "")
 
-    print(cmd)
-    system(cmd)
+    # print(cmd)
+    # system(cmd)
 
     current_results <- read.csv("current_results.csv", header = TRUE)
 
@@ -94,11 +97,13 @@ for(i in 1:iterations){
 
     for(j in 1:gpr_iterations){
         # Optimzing for Top5
+        print("Starting reg")
         gpr_model <- km(design = select(search_space, -Top5, -Top1),
                         response = search_space$Top5,
                         control = list(pop.size = 400,
                                        BFGSburnin = 500))
 
+        print("Generating Sample")
         new_sample <- sobol(n = gpr_sample_size,
                             dim = sobol_dim,
                             scrambling = 3,
@@ -112,7 +117,11 @@ for(i in 1:iterations){
                 distinct()
         }
 
-        gpr_sample$expected_improvement <- apply(gpr_sample, 1, EI, gpr_model)
+        print("Computing EI")
+        new_ei <- future_apply(gpr_sample, 1, EI, gpr_model)
+        print(str(new_ei))
+        print(str(gpr_sample))
+        gpr_sample$expected_improvement <- new_ei
 
         gpr_selected_points <- gpr_sample %>%
             arrange(desc(expected_improvement))
@@ -120,6 +129,7 @@ for(i in 1:iterations){
         gpr_selected_points <- select(gpr_selected_points[1:gpr_added_points, ],
                                       -expected_improvement)
 
+        print("Generating perturbation sample")
         perturbation <- sobol(n = gpr_added_points * gpr_neighbourhood_factor,
                               dim = sobol_dim,
                               scrambling = 3,
@@ -134,7 +144,8 @@ for(i in 1:iterations){
         gpr_selected_points <- gpr_selected_points * perturbation %>%
             distinct()
 
-        gpr_selected_points$expected_improvement <- apply(gpr_selected_points,
+        print("Computing perturbed EI")
+        gpr_selected_points$expected_improvement <- future_apply(gpr_selected_points,
                                                           1,
                                                           EI,
                                                           gpr_model)
