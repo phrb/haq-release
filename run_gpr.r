@@ -25,11 +25,11 @@ bit_min <- 1
 bit_max <- 8
 perturbation_range <- 1 * (bit_min / bit_max)
 
-gpr_iterations <- 10
-gpr_added_points <- 1
+gpr_iterations <- 2
+gpr_added_points <- 2
 
-gpr_added_neighbours <- 1
-gpr_neighbourhood_factor <- 2
+gpr_added_neighbours <- 2
+gpr_neighbourhood_factor <- 10
 
 gpr_sample_size <- sobol_dim * 1
 
@@ -129,8 +129,10 @@ for(i in 1:iterations){
         }
 
         print("Computing EI")
-        new_ei <- future_apply(gpr_sample, 1, EI, gpr_model)
-        gpr_sample$expected_improvement <- new_ei
+        gpr_sample$expected_improvement <- future_apply(gpr_sample,
+                                                        1,
+                                                        EI,
+                                                        gpr_model)
 
         gpr_selected_points <- gpr_sample %>%
             arrange(desc(expected_improvement))
@@ -161,22 +163,26 @@ for(i in 1:iterations){
 
         gpr_selected_neighbourhood <- gpr_selected_neighbourhood + perturbation
 
-        gpr_selected_points[gpr_selected_points < 0.0] <- 0.0
-        gpr_selected_points[gpr_selected_points > 1.0] <- 1.0
+        gpr_selected_neighbourhood[gpr_selected_neighbourhood < 0.0] <- 0.0
+        gpr_selected_neighbourhood[gpr_selected_neighbourhood > 1.0] <- 1.0
+
+        gpr_selected_points <- bind_rows(gpr_selected_points,
+                                         gpr_selected_neighbourhood)
 
         gpr_selected_points <- gpr_selected_points %>%
             distinct()
 
         print("Computing perturbed EI")
         gpr_selected_points$expected_improvement <- future_apply(gpr_selected_points,
-                                                          1,
-                                                          EI,
-                                                          gpr_model)
+                                                                 1,
+                                                                 EI,
+                                                                 gpr_model)
 
         gpr_selected_points <- gpr_selected_points %>%
             arrange(desc(expected_improvement))
 
-        gpr_selected_points <- select(gpr_selected_points[1:gpr_added_points, ],
+        gpr_selected_points <- select(gpr_selected_points[1:(gpr_added_points +
+                                                             gpr_added_neighbours), ],
                                       -expected_improvement)
 
         df_design <- data.frame(gpr_selected_points)
