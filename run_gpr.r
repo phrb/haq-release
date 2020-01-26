@@ -101,7 +101,7 @@ for(i in 1:iterations){
         # Optimzing for Top5
         print("Starting reg")
         gpr_model <- km(design = select(search_space, -Top5, -Top1),
-                        response = search_space$Top5,
+                        response = 100.0 - search_space$Top5,
                         control = list(pop.size = 400,
                                        BFGSburnin = 500))
 
