@@ -23,11 +23,13 @@ sobol_n <- starting_sobol_n
 
 bit_min <- 1
 bit_max <- 8
-perturbation_range <- 2 * (bit_min / bit_max)
+perturbation_range <- 1 * (bit_min / bit_max)
 
 gpr_iterations <- 10
-gpr_added_points <- 5
-gpr_neighbourhood_factor <- 10
+gpr_added_points <- 1
+
+gpr_added_neighbours <- 1
+gpr_neighbourhood_factor <- 2
 
 gpr_sample_size <- sobol_dim * 1
 
@@ -154,10 +156,10 @@ for(i in 1:iterations){
 
         perturbation <- (2 * perturbation_range * perturbation) - perturbation_range
 
-        gpr_selected_points <- gpr_selected_points %>%
+        gpr_selected_neighbourhood <- gpr_selected_points %>%
             slice(rep(row_number(), gpr_neighbourhood_factor))
 
-        gpr_selected_points <- gpr_selected_points * perturbation
+        gpr_selected_neighbourhood <- gpr_selected_neighbourhood + perturbation
 
         gpr_selected_points[gpr_selected_points < 0.0] <- 0.0
         gpr_selected_points[gpr_selected_points > 1.0] <- 1.0
