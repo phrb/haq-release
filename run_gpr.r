@@ -163,8 +163,8 @@ for(i in 1:iterations){
 
         gpr_selected_neighbourhood <- gpr_selected_neighbourhood + perturbation
 
-        gpr_selected_neighbourhood[gpr_selected_neighbourhood < 0.0] <- 0.0
-        gpr_selected_neighbourhood[gpr_selected_neighbourhood > 1.0] <- 1.0
+        gpr_selected_neighbourhood[gpr_selected_neighbourhood < 0.0] <- 0.124
+        gpr_selected_neighbourhood[gpr_selected_neighbourhood > 1.0] <- 0.876
 
         gpr_selected_points <- bind_rows(gpr_selected_points,
                                          gpr_selected_neighbourhood)
