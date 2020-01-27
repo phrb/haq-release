@@ -18,20 +18,20 @@ iterations <- 10
 results <- NULL
 
 sobol_dim <- 54 * 2
-starting_sobol_n <- (1 * sobol_dim) + 2
+starting_sobol_n <- (1 * sobol_dim) + 1
 sobol_n <- starting_sobol_n
 
 bit_min <- 1
 bit_max <- 8
 perturbation_range <- 1 * (bit_min / bit_max)
 
-gpr_iterations <- 2
-gpr_added_points <- 2
+gpr_iterations <- 20
+gpr_added_points <- 3
 
 gpr_added_neighbours <- 2
-gpr_neighbourhood_factor <- 10
+gpr_neighbourhood_factor <- 1000
 
-gpr_sample_size <- sobol_dim * 1
+gpr_sample_size <- 200 * sobol_dim
 
 total_measurements <- starting_sobol_n + (gpr_iterations * gpr_added_points)
 
@@ -63,21 +63,21 @@ for(i in 1:iterations){
                                       seq(1:(sobol_dim / 2)),
                                       sep = "")))
 
-    #write.csv(df_design, "current_design.csv", row.names = FALSE)
+    write.csv(df_design, "current_design.csv", row.names = FALSE)
 
     start_time <- as.integer(format(Sys.time(), "%s"))
 
-    # cmd <- paste("python3 -W ignore rl_quantize.py --arch resnet50",
-    #              " --dataset imagenet --dataset_root data",
-    #              " --suffix ratio010 --preserve_ratio 0.1",
-    #              " --n_worker 120 --warmup -1 --train_episode ",
-    #              sobol_n,
-    #              " --data_bsize 128 --optimizer RS --val_size 10000",
-    #              " --train_size 20000",
-    #              sep = "")
+    cmd <- paste("python3 -W ignore rl_quantize.py --arch resnet50",
+                 " --dataset imagenet --dataset_root data",
+                 " --suffix ratio010 --preserve_ratio 0.1",
+                 " --n_worker 120 --warmup -1 --train_episode ",
+                 sobol_n,
+                 " --data_bsize 128 --optimizer RS --val_size 10000",
+                 " --train_size 20000",
+                 sep = "")
 
-    # print(cmd)
-    # system(cmd)
+    print(cmd)
+    system(cmd)
 
     current_results <- read.csv("current_results.csv", header = TRUE)
 
