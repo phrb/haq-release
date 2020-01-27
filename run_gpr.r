@@ -137,6 +137,8 @@ for(i in 1:iterations){
         gpr_selected_points <- gpr_sample %>%
             arrange(desc(expected_improvement))
 
+        gpr_sample <- select(gpr_sample, -expected_improvement)
+
         gpr_selected_points <- select(gpr_selected_points[1:gpr_added_points, ],
                                       -expected_improvement)
 
@@ -166,9 +168,11 @@ for(i in 1:iterations){
         gpr_selected_neighbourhood[gpr_selected_neighbourhood < 0.0] <- 0.124
         gpr_selected_neighbourhood[gpr_selected_neighbourhood > 1.0] <- 0.876
 
+        gpr_sample <- bind_rows(gpr_sample, gpr_selected_neighbourhood) %>%
+            distinct()
+
         gpr_selected_points <- bind_rows(gpr_selected_points,
                                          gpr_selected_neighbourhood)
-
         gpr_selected_points <- gpr_selected_points %>%
             distinct()
 
