@@ -153,7 +153,7 @@ class QuantizeEnv:
             search_space_dict["Top1"] = [top_accs["top1"]]
             search_space_dict["Top5"] = [top_accs["top5"]]
 
-            self.search_space = self.search_space.append(DataFrame(search_space_dict))
+            self.search_space = self.search_space.append(pd.DataFrame(search_space_dict))
             self.search_space.to_csv("haq_results_log.csv", index = False)
 
             if reward > self.best_reward:
