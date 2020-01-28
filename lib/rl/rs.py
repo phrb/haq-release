@@ -53,7 +53,6 @@ class RS(object):
             self.current_column = 0
             self.current_row += 1
 
-        print("acting on row: {0} col: {1}".format(self.current_row, self.current_column))
         return self.current_action
 
     def select_action(self, s_t, episode, decay_epsilon = True):
@@ -66,8 +65,6 @@ class RS(object):
             return self.random_action()
 
     def save_accuracy(self, top1, top5):
-        print("saving row: {0} col: {1}".format(self.current_row, self.current_column))
-
         self.episode_end = True
         self.design.at[self.current_row - 1, "Top1"] = top1
         self.design.at[self.current_row - 1, "Top5"] = top5

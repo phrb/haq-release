@@ -188,7 +188,7 @@ class DDPG(object):
     def random_action(self):
         action = np.random.uniform(self.lbound, self.rbound, self.nb_actions)
         # self.a_t = action
-        return action
+        return list(action)
 
     def select_action(self, s_t, episode, decay_epsilon=True):
         # assert episode >= self.warmup, 'Episode: {} warmup: {}'.format(episode, self.warmup)
@@ -201,7 +201,7 @@ class DDPG(object):
         # update for log
         self.delta = delta
         # self.a_t = action
-        return action
+        return list(action)
 
     def reset(self, obs):
         pass

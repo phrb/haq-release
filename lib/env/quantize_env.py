@@ -71,6 +71,17 @@ class QuantizeEnv:
         self._get_weight_size()
         self.n_quantizable_layer = len(self.quantizable_idx)
 
+        search_space_dict = {}
+
+        for i in len(self.quantizable_idx):
+            for j in ["W", "A"]:
+                search_space_dict["{0}{1}".format(j, i + 1)] = []
+
+        search_space_dict["Top1"] = []
+        search_space_dict["Top5"] = []
+
+        self.search_space = pd.DataFrame(search_space_dict)
+
         self.model.load_state_dict(self.pretrained_model, strict=True)
 
         top_accs = self._validate(self.val_loader, self.model)
@@ -131,6 +142,18 @@ class QuantizeEnv:
                         'top1': top_accs['top1'],
                         'top5': top_accs['top5'],
                         'w_size': w_size}
+
+            search_space_dict = {}
+
+            for i in len(self.strategy):
+                search_space_dict["W{0}".format(i + 1)] = [self.strategy[i][0]]
+                search_space_dict["A{0}".format(i + 1)] = [self.strategy[i][1]]
+
+            search_space_dict["Top1"] = [top_accs["top1"]]
+            search_space_dict["Top5"] = [top_accs["top5"]]
+
+            self.search_space = self.search_space.append(DataFrame(search_space_dict))
+            self.search_space.to_csv("haq_results_log.csv", index = False)
 
             if reward > self.best_reward:
                 self.best_reward = reward
