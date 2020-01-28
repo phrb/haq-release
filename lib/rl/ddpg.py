@@ -163,7 +163,7 @@ class DDPG(object):
         # Target update
         self.soft_update(self.actor_target, self.actor)
         self.soft_update(self.critic_target, self.critic)
-        
+
         # update for log
         self.value_loss = value_loss
         self.policy_loss = policy_loss
@@ -196,7 +196,7 @@ class DDPG(object):
         delta = self.init_delta * (self.delta_decay ** (episode - self.warmup))
         # action += self.is_training * max(self.epsilon, 0) * self.random_process.sample()
         #from IPython import embed; embed() # TODO eable decay_epsilon=True
-        action = sample_from_truncated_normal_distribution(lower=self.lbound, upper=self.rbound, mu=action, sigma=delta)
+        action = sample_from_truncated_normal_distribution(lower=self.lbound, upper=self.rbound, mu=action, sigma=delta, size = self.nb_actions)
         action = np.clip(action, self.lbound, self.rbound)
         # update for log
         self.delta = delta
