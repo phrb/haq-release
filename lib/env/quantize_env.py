@@ -74,6 +74,10 @@ class QuantizeEnv:
         self.model.load_state_dict(self.pretrained_model, strict=True)
 
         top_accs = self._validate(self.val_loader, self.model)
+
+        print("Original Top1: {0}".format(top_accs["top1"]))
+        print("Original Top5: {0}".format(top_accs["top5"]))
+
         self.org_acc = top_accs["top1"]
         # build embedding (static part), same as pruning
         self._build_state_embedding()

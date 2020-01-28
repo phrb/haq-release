@@ -229,7 +229,7 @@ if __name__ == "__main__":
                       batch_size=args.data_bsize, args=args, float_bit=args.float_bit, is_model_pruned=args.is_pruned)
 
     nb_states = env.layer_embedding.shape[1]
-    nb_actions = 1  # actions for weight and activation quantization
+    nb_actions = 2  # actions for weight and activation quantization
     args.rmsize = args.rmsize * len(env.quantizable_idx)  # for each layer
     print('** Actual replay buffer size: {}'.format(args.rmsize))
     agent = optimizer_dict[args.optimizer](nb_states, nb_actions, args)

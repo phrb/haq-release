@@ -33,7 +33,7 @@ gpr_neighbourhood_factor <- 1000
 
 gpr_sample_size <- 200 * sobol_dim
 
-total_measurements <- starting_sobol_n + (gpr_iterations * gpr_added_points)
+total_measurements <- starting_sobol_n + (gpr_iterations * (gpr_added_points + gpr_added_neighbours))
 
 for(i in 1:iterations){
     gpr_sample <- NULL
