@@ -72,12 +72,15 @@ for(i in 1:iterations){
                  " --suffix ratio010 --preserve_ratio 0.1",
                  " --n_worker 120 --warmup -1 --train_episode ",
                  sobol_n,
+                 " --use_top5",
                  " --data_bsize 128 --optimizer RS --val_size 10000",
                  " --train_size 20000",
                  sep = "")
 
     print(cmd)
     system(cmd)
+
+    system("rm -r ../../save")
 
     current_results <- read.csv("current_results.csv", header = TRUE)
 
@@ -204,12 +207,15 @@ for(i in 1:iterations){
                      " --suffix ratio010 --preserve_ratio 0.1",
                      " --n_worker 120 --warmup -1 --train_episode ",
                      gpr_added_points + gpr_added_neighbours,
+                     " --use_top5",
                      " --data_bsize 128 --optimizer RS --val_size 10000",
                      " --train_size 20000",
                      sep = "")
 
         print(cmd)
         system(cmd)
+
+        system("rm -r ../../save")
 
         current_results <- read.csv("current_results.csv", header = TRUE)
 

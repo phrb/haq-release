@@ -20,12 +20,15 @@ for(i in 1:iterations){
                  " --suffix ratio010 --preserve_ratio 0.1",
                  " --n_worker 120 --warmup 2 --train_episode ",
                  total_measurements,
+                 " --use_top5",
                  " --data_bsize 128 --optimizer DDPG --val_size 10000",
                  " --train_size 20000",
                  sep = "")
 
     print(cmd)
     system(cmd)
+
+    system("rm -r ../../save")
 
     elapsed_time <- as.integer(format(Sys.time(), "%s")) - start_time
 

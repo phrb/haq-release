@@ -54,15 +54,19 @@ for(i in 1:iterations){
 
     start_time <- as.integer(format(Sys.time(), "%s"))
 
-    cmd <- paste("python3 -W ignore rl_quantize.py --arch resnet50 --dataset imagenet --dataset_root data",
-                 " --suffix ratio010 --preserve_ratio 0.1 --n_worker 120 --warmup -1 --train_episode ",
+    cmd <- paste("python3 -W ignore rl_quantize.py",
+                 " --arch resnet50 --dataset imagenet --dataset_root data",
+                 " --suffix ratio010 --preserve_ratio 0.1 --n_worker 120",
+                 " --warmup -1 --train_episode ",
                  sobol_n,
+                 " --use_top5",
                  " --data_bsize 128 --optimizer RS --val_size 10000 --train_size 20000",
                  sep = "")
 
     print(cmd)
-
     system(cmd)
+
+    system("rm -r ../../save")
 
     elapsed_time <- as.integer(format(Sys.time(), "%s")) - start_time
 
