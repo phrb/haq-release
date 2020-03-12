@@ -5,7 +5,7 @@ library(DiceKriging)
 library(DiceOptim)
 library(future.apply)
 
-plan(multiprocess, workers = 256)
+plan(multiprocess, workers = 128)
 
 quiet <- function(x) {
   sink(tempfile())
@@ -41,7 +41,7 @@ for(i in 1:iterations){
 
     temp_sobol <- sobol(n = sobol_n,
                         dim = sobol_dim,
-                        scrambling = 3,
+                        scrambling = 1,
                         seed = as.integer((99999 - 10000) * runif(1) + 10000),
                         init = TRUE)
 
@@ -50,7 +50,7 @@ for(i in 1:iterations){
 
     design <- sobol(n = sobol_n,
                     dim = sobol_dim,
-                    scrambling = 3,
+                    scrambling = 1,
                     seed = as.integer((99999 - 10000) * runif(1) + 10000),
                     init = FALSE)
 
@@ -104,14 +104,15 @@ for(i in 1:iterations){
         # Optimzing for Top5
         print("Starting reg")
         gpr_model <- km(design = select(search_space, -Top5, -Top1),
-                        response = 100.0 - search_space$Top5,
+                        response = ((rowSums(select(search_space, -Top5, Top1)) / sobol_dim) +
+                                    ((100.0 - search_space$Top5) / 100.0)) / 2,
                         control = list(pop.size = 400,
                                        BFGSburnin = 500))
 
         print("Generating Sample")
         new_sample <- sobol(n = gpr_sample_size,
                             dim = sobol_dim,
-                            scrambling = 3,
+                            scrambling = 1,
                             seed = as.integer((99999 - 10000) * runif(1) + 10000),
                             init = FALSE)
 
@@ -148,7 +149,7 @@ for(i in 1:iterations){
         print("Generating perturbation sample")
         perturbation <- sobol(n = gpr_added_points * gpr_neighbourhood_factor,
                               dim = sobol_dim,
-                              scrambling = 3,
+                              scrambling = 1,
                               seed = as.integer((99999 - 10000) * runif(1) + 10000),
                               init = FALSE)
 
