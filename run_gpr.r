@@ -5,7 +5,7 @@ library(DiceKriging)
 library(DiceOptim)
 library(future.apply)
 
-plan(multiprocess, workers = 128)
+plan(multiprocess, workers = 256)
 
 quiet <- function(x) {
   sink(tempfile())
