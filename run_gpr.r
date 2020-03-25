@@ -13,7 +13,7 @@ quiet <- function(x) {
   invisible(force(x))
 }
 
-iterations <- 10
+iterations <- 3
 
 results <- NULL
 
@@ -103,11 +103,19 @@ for(i in 1:iterations){
     for(j in 1:gpr_iterations){
         # Optimzing for Top5
         print("Starting reg")
+        # Mean acc + size
+        # gpr_model <- km(design = select(search_space, -Top5, -Top1),
+        #                 response = ((rowSums(select(search_space, -Top5, -Top1)) / sobol_dim) +
+        #                             ((100.0 - search_space$Top5) / 100.0)) / 2,
+        #                 control = list(pop.size = 400,
+        #                                BFGSburnin = 500))
+
+        # size only
         gpr_model <- km(design = select(search_space, -Top5, -Top1),
-                        response = ((rowSums(select(search_space, -Top5, -Top1)) / sobol_dim) +
-                                    ((100.0 - search_space$Top5) / 100.0)) / 2,
+                        response = rowSums(select(search_space, -Top5, -Top1)) / sobol_dim,
+
                         control = list(pop.size = 400,
-                                       BFGSburnin = 500))
+                                        BFGSburnin = 500))
 
         print("Generating Sample")
         new_sample <- sobol(n = gpr_sample_size,
@@ -240,7 +248,13 @@ for(i in 1:iterations){
     elapsed_time <- as.integer(format(Sys.time(), "%s")) - start_time
 
     # Optimizing for Top5 (Top1, Model Size, Latency... ?)
-    best_points <- filter(search_space, Top5 == max(Top5))
+
+    # top5 only
+    # best_points <- filter(search_space, Top5 == max(Top5))
+
+    # size only
+    best_points <- filter(search_space,
+                          rowSums(select(search_space, -Top5, -Top1)) == min(rowSums(select(search_space, -Top5, -Top1))))
 
     best_points$id <- i
     best_points$elapsed_seconds <- elapsed_time
