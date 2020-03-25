@@ -259,7 +259,7 @@ for(i in 1:iterations){
     }
 
     write.csv(results,
-              paste("gpr_",
+              paste("gpr_s_only",
                     total_measurements,
                     "_samples_",
                     iterations,
