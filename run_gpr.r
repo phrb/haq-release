@@ -101,14 +101,18 @@ for(i in 1:iterations){
               row.names = FALSE)
 
     for(j in 1:gpr_iterations){
-        # Optimzing for Top5
         print("Starting reg")
-        # Mean acc + size
-        # gpr_model <- km(design = select(search_space, -Top5, -Top1),
-        #                 response = ((rowSums(select(search_space, -Top5, -Top1)) / sobol_dim) +
-        #                             ((100.0 - search_space$Top5) / 100.0)) / 2,
-        #                 control = list(pop.size = 400,
-        #                                BFGSburnin = 500))
+        size_weight <- 1
+        top1_weight <- 1
+        top5_weight <- 2
+
+        gpr_model <- km(design = select(search_space, -Top5, -Top1),
+                        response = ((size_weight * (rowSums(select(search_space, -Top5, -Top1)) / sobol_dim)) +
+                                    (top1_weight * ((100.0 - search_space$Top1) / 100.0)) +
+                                    (top5_weight * ((100.0 - search_space$Top5) / 100.0))) /
+                            (size_weight + top1_weight + top5_weight),
+                        control = list(pop.size = 400,
+                                       BFGSburnin = 500))
 
         # size only
         gpr_model <- km(design = select(search_space, -Top5, -Top1),
@@ -236,7 +240,7 @@ for(i in 1:iterations){
         }
 
         write.csv(search_space,
-                  paste("gpr_",
+                  paste("gpr_w_a_",
                         total_measurements,
                         "_samples_",
                         i,
@@ -252,9 +256,17 @@ for(i in 1:iterations){
     # top5 only
     # best_points <- filter(search_space, Top5 == max(Top5))
 
+    response_data <- search_space %>%
+        mutate(performance_metric = ((size_weight * (rowSums(select(search_space, -Top5, -Top1)) / sobol_dim)) +
+                                     (top1_weight * ((100.0 - search_space$Top1) / 100.0)) +
+                                     (top5_weight * ((100.0 - search_space$Top5) / 100.0))) /
+                   (size_weight + top1_weight + top5_weight))
+
     # size only
-    best_points <- filter(search_space,
-                          rowSums(select(search_space, -Top5, -Top1)) == min(rowSums(select(search_space, -Top5, -Top1))))
+    # best_points <- filter(search_space,
+    #                       rowSums(select(search_space, -Top5, -Top1)) == min(rowSums(select(search_space, -Top5, -Top1))))
+
+    best_points <- search_space[response_data$performance_metric == min(response_data$performance_metric), ]
 
     best_points$id <- i
     best_points$elapsed_seconds <- elapsed_time
@@ -273,7 +285,7 @@ for(i in 1:iterations){
     }
 
     write.csv(results,
-              paste("gpr_s_only",
+              paste("gpr_w_a_",
                     total_measurements,
                     "_samples_",
                     iterations,
