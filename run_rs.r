@@ -13,7 +13,12 @@ iterations <- 10
 search_space <- NULL
 results <- NULL
 
+# Resnet50
 sobol_dim <- 54 * 2
+
+# VGG19
+sobol_dim <- 19 * 2
+
 starting_sobol_n <- 2 * sobol_dim
 
 sobol_n <- starting_sobol_n
