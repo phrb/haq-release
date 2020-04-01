@@ -45,6 +45,15 @@ class RS(object):
         pass
 
     def random_action(self):
+        print("current_row: {}".format(self.current_row))
+        print("current_column: {}".format(self.current_column))
+        print("design shape: [rows: {0}, cols: {1}]".format(self.design.shape[0],
+                                                            self.design.shape[1]))
+        print("accessed rows: [{0}, {1}], [{2}, {3}]".format(self.current_row,
+                                                             self.current_column,
+                                                             self.current_row,
+                                                             self.current_column + 1))
+
         self.current_action = [self.design.iat[self.current_row, self.current_column],
                                self.design.iat[self.current_row, self.current_column + 1]]
 
