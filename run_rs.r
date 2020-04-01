@@ -8,7 +8,7 @@ quiet <- function(x) {
   invisible(force(x))
 }
 
-iterations <- 10
+iterations <- 3
 
 search_space <- NULL
 results <- NULL
