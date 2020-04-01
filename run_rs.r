@@ -14,7 +14,7 @@ search_space <- NULL
 results <- NULL
 
 # Resnet50
-sobol_dim <- 54 * 2
+# sobol_dim <- 54 * 2
 
 # VGG19
 sobol_dim <- 19 * 2

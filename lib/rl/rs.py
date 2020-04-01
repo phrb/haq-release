@@ -22,6 +22,7 @@ class RS(object):
 
         # self.design = pd.read_csv("experimental_designs/sobol_resnet50_600_samples.csv")
         self.design = pd.read_csv("current_design.csv")
+        print(str(self.design))
         self.design["Top1"] = float("inf")
         self.design["Top5"] = float("inf")
 
