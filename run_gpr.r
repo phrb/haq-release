@@ -17,7 +17,11 @@ iterations <- 3
 
 results <- NULL
 
-sobol_dim <- 54 * 2
+# Resnet50
+# sobol_dim <- 54 * 2
+
+# vgg19
+sobol_dim <- 19 * 2
 starting_sobol_n <- (1 * sobol_dim) + 1
 sobol_n <- starting_sobol_n
 
@@ -34,6 +38,8 @@ gpr_neighbourhood_factor <- 1000
 gpr_sample_size <- 200 * sobol_dim
 
 total_measurements <- starting_sobol_n + (gpr_iterations * (gpr_added_points + gpr_added_neighbours))
+
+network <- "vgg19"
 
 for(i in 1:iterations){
     gpr_sample <- NULL
@@ -67,7 +73,8 @@ for(i in 1:iterations){
 
     start_time <- as.integer(format(Sys.time(), "%s"))
 
-    cmd <- paste("python3 -W ignore rl_quantize.py --arch resnet50",
+    cmd <- paste("python3 -W ignore rl_quantize.py --arch ",
+                 network,
                  " --dataset imagenet --dataset_root data",
                  " --suffix ratio010 --preserve_ratio 0.1",
                  " --n_worker 120 --warmup -1 --train_episode ",
@@ -215,7 +222,8 @@ for(i in 1:iterations){
 
         write.csv(df_design, "current_design.csv", row.names = FALSE)
 
-        cmd <- paste("python3 -W ignore rl_quantize.py --arch resnet50",
+        cmd <- paste("python3 -W ignore rl_quantize.py --arch ",
+                     network,
                      " --dataset imagenet --dataset_root data",
                      " --suffix ratio010 --preserve_ratio 0.1",
                      " --n_worker 120 --warmup -1 --train_episode ",
@@ -240,7 +248,7 @@ for(i in 1:iterations){
         }
 
         write.csv(search_space,
-                  paste("gpr_w_a_",
+                  paste("gpr_",
                         total_measurements,
                         "_samples_",
                         i,
@@ -285,7 +293,7 @@ for(i in 1:iterations){
     }
 
     write.csv(results,
-              paste("gpr_w_a_",
+              paste("gpr_",
                     total_measurements,
                     "_samples_",
                     iterations,
