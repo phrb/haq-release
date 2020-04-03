@@ -6,16 +6,19 @@ quiet <- function(x) {
   invisible(force(x))
 }
 
-iterations <- 10
+iterations <- 2
 results <- NULL
 
-total_measurements <- 207
+total_measurements <- 2 * 2 * 19
+
+network <- "vgg19"
 
 for(i in 1:iterations){
     search_space <- NULL
     start_time <- as.integer(format(Sys.time(), "%s"))
 
-    cmd <- paste("python3 -W ignore rl_quantize.py --arch resnet50",
+    cmd <- paste("python3 -W ignore rl_quantize.py --arch ",
+                 network,
                  " --dataset imagenet --dataset_root data",
                  " --suffix ratio010 --preserve_ratio 0.1",
                  " --n_worker 120 --warmup 2 --train_episode ",
