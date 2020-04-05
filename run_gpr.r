@@ -13,7 +13,7 @@ quiet <- function(x) {
   invisible(force(x))
 }
 
-iterations <- 3
+iterations <- 2
 
 results <- NULL
 
@@ -152,21 +152,14 @@ for(i in 1:iterations){
         print("Coded weight df:")
         print(str(coded_size_df))
 
+        #response = ((size_weight * rowSums(select(search_space, -Top5, -Top1)) / sobol_dim)) +
         gpr_model <- km(design = select(search_space, -Top5, -Top1),
-                        #response = ((size_weight * rowSums(select(search_space, -Top5, -Top1)) / sobol_dim)) +
                         response = (size_weight * (coded_size_df$total_size_MB / coded_size_df$network_size_MB)) +
                                     (top1_weight * ((100.0 - search_space$Top1) / 100.0)) +
                                     (top5_weight * ((100.0 - search_space$Top5) / 100.0))) /
                             (size_weight + top1_weight + top5_weight),
                         control = list(pop.size = 400,
                                        BFGSburnin = 500))
-
-        # size only
-        gpr_model <- km(design = select(search_space, -Top5, -Top1),
-                        response = rowSums(select(search_space, -Top5, -Top1)) / sobol_dim,
-
-                        control = list(pop.size = 400,
-                                        BFGSburnin = 500))
 
         print("Generating Sample")
         new_sample <- sobol(n = gpr_sample_size,
