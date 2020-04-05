@@ -154,7 +154,7 @@ for(i in 1:iterations){
 
         #response = ((size_weight * rowSums(select(search_space, -Top5, -Top1)) / sobol_dim)) +
         gpr_model <- km(design = select(search_space, -Top5, -Top1),
-                        response = (size_weight * (coded_size_df$total_size_MB / coded_size_df$network_size_MB)) +
+                        response = ((size_weight * (coded_size_df$total_size_MB / coded_size_df$network_size_MB)) +
                                     (top1_weight * ((100.0 - search_space$Top1) / 100.0)) +
                                     (top5_weight * ((100.0 - search_space$Top5) / 100.0))) /
                             (size_weight + top1_weight + top5_weight),
