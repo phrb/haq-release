@@ -18,16 +18,17 @@ iterations <- 3
 results <- NULL
 
 # Resnet50
-# sobol_dim <- 54 * 2
+sobol_dim <- 54 * 2
 
 # vgg19
-sobol_dim <- 19 * 2
+# sobol_dim <- 19 * 2
+
 starting_sobol_n <- (1 * sobol_dim) + 1
 sobol_n <- starting_sobol_n
 
 bit_min <- 1
 bit_max <- 8
-perturbation_range <- 1 * (bit_min / bit_max)
+perturbation_range <- 2 * (bit_min / bit_max)
 
 gpr_iterations <- 20
 gpr_added_points <- 3
