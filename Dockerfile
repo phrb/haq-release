@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         r-base &&                                                \
         rm -rf /var/lib/apt/lists/*
 
+RUN Rscript -e 'install.packages("http://cran.r-project.org/src/contrib/Archive/Rcpp/Rcpp_1.0.3.tar.gz", repos = NULL, type = "source")'
 RUN Rscript -e 'install.packages(c("rsm", "dplyr", "tidyr", "DiceKriging", "DiceDesign", "DiceOptim","randtoolbox", "future.apply"), repos="http://cran.us.r-project.org")'
 
 RUN pip3 install wheel
