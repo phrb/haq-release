@@ -1,5 +1,6 @@
 library(randtoolbox)
 library(dplyr)
+library(tidyr)
 library(rsm)
 library(DiceKriging)
 library(DiceOptim)
