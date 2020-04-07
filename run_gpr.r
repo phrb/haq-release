@@ -44,6 +44,14 @@ total_measurements <- starting_sobol_n + (gpr_iterations * (gpr_added_points + g
 network <- "resnet50"
 network_sizes_data <- "network_sizes_data.csv"
 
+size_weight <- 1
+top1_weight <- 0
+top5_weight <- 0
+
+network_sizes <- read.csv(network_sizes_data)
+network_specs <- network_sizes %>%
+    filter(id == network)
+
 for(i in 1:iterations){
     gpr_sample <- NULL
     search_space <- NULL
@@ -113,10 +121,6 @@ for(i in 1:iterations){
     for(j in 1:gpr_iterations){
         print("Starting reg")
 
-        size_weight <- 1
-        top1_weight <- 0
-        top5_weight <- 0
-
         size_df <- select(search_space, -Top5, -Top1)
         formulas <- character(length(names(size_df)))
 
@@ -132,12 +136,6 @@ for(i in 1:iterations){
         coded_size_df <- round(data.frame(coded_size_df))
         coded_size_df$id <- seq(1:length(coded_size_df$A1e))
         coded_size_df <- gather(coded_size_df, "Layer", "Bitwidth", -id)
-
-        network_sizes <- read.csv(network_sizes_data)
-        str(coded_size_df)
-
-        network_specs <- network_sizes %>%
-            filter(id == network)
 
         coded_size_df <- coded_size_df %>%
             group_by(id) %>%
@@ -298,15 +296,36 @@ for(i in 1:iterations){
     # top5 only
     # best_points <- filter(search_space, Top5 == max(Top5))
 
+    size_df <- select(search_space, -Top5, -Top1)
+    formulas <- character(length(names(size_df)))
+
+    for(i in 1:length(names(size_df))){
+        formulas[i] <- paste(names(size_df)[i],
+                             "e ~ round((7 * ",
+                             names(size_df)[i],
+                             ") + 1)",
+                             sep = "")
+    }
+
+    coded_size_df <- coded.data(size_df, formulas = lapply(formulas, formula))
+    coded_size_df <- round(data.frame(coded_size_df))
+    coded_size_df$id <- seq(1:length(coded_size_df$A1e))
+    coded_size_df <- gather(coded_size_df, "Layer", "Bitwidth", -id)
+
+    coded_size_df <- coded_size_df %>%
+        group_by(id) %>%
+        do(mutate(., weights_MB = sum((network_specs$parameters *
+                                       (filter(., grepl("W", Layer))$Bitwidth / 8)) / 1e6))) %>%
+        do(mutate(., activations_MB = sum((network_specs$activations *
+                                           (filter(., grepl("A", Layer))$Bitwidth / 8)) / 1e6))) %>%
+        summarize(total_size_MB = unique(weights_MB) + unique(activations_MB),
+                  network_size_MB = sum(network_specs$bits8_size_MB))
+
     response_data <- search_space %>%
-        mutate(performance_metric = ((size_weight * (rowSums(select(search_space, -Top5, -Top1)) / sobol_dim)) +
+        mutate(performance_metric = ((size_weight * (coded_size_df$total_size_MB / coded_size_df$network_size_MB)) +
                                      (top1_weight * ((100.0 - search_space$Top1) / 100.0)) +
                                      (top5_weight * ((100.0 - search_space$Top5) / 100.0))) /
                    (size_weight + top1_weight + top5_weight))
-
-    # size only
-    # best_points <- filter(search_space,
-    #                       rowSums(select(search_space, -Top5, -Top1)) == min(rowSums(select(search_space, -Top5, -Top1))))
 
     best_points <- search_space[response_data$performance_metric == min(response_data$performance_metric), ]
 
