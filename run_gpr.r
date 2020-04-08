@@ -46,6 +46,7 @@ network_sizes_data <- "network_sizes_data.csv"
 
 preserve_ratio <- 0.1
 batch_size <- 64
+cuda_device <- 0
 
 size_weight <- 1
 top1_weight <- 0
@@ -94,7 +95,9 @@ for(i in 1:iterations){
 
     start_time <- as.integer(format(Sys.time(), "%s"))
 
-    cmd <- paste("python3 -W ignore rl_quantize.py --arch ",
+    cmd <- paste("CUDA_VISIBLE_DEVICES=",
+                 cuda_device,
+                 " python3 -W ignore rl_quantize.py --arch ",
                  network,
                  " --dataset imagenet --dataset_root data",
                  " --suffix ratio010 --preserve_ratio ",
@@ -269,7 +272,9 @@ for(i in 1:iterations){
 
         write.csv(df_design, "current_design.csv", row.names = FALSE)
 
-        cmd <- paste("python3 -W ignore rl_quantize.py --arch ",
+        cmd <- paste("CUDA_VISIBLE_DEVICES=",
+                     cuda_device,
+                     " python3 -W ignore rl_quantize.py --arch ",
                      network,
                      " --dataset imagenet --dataset_root data",
                      " --suffix ratio010 --preserve_ratio ",
