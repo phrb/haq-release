@@ -54,12 +54,12 @@ for(i in 1:iterations){
 
     start_time <- as.integer(format(Sys.time(), "%s"))
 
-    cmd <- paste("python3 -W ignore rl_quantize.py",
+    cmd <- paste("CUDA_VISIBLE_DEVICES=0 python3 -W ignore rl_quantize.py",
                  " --arch resnet50 --dataset imagenet --dataset_root data",
                  " --suffix ratio010 --preserve_ratio 0.1 --n_worker 120",
                  " --warmup -1 --train_episode ",
                  sobol_n,
-                 " --use_top5",
+                 " --use_top5 --gpu_id 0",
                  " --data_bsize 128 --optimizer RS --val_size 10000 --train_size 20000",
                  sep = "")
 
