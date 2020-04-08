@@ -44,6 +44,9 @@ total_measurements <- starting_sobol_n + (gpr_iterations * (gpr_added_points + g
 network <- "resnet50"
 network_sizes_data <- "network_sizes_data.csv"
 
+preserve_ratio <- 0.1
+batch_size <- 64
+
 size_weight <- 1
 top1_weight <- 0
 top5_weight <- 0
@@ -87,11 +90,14 @@ for(i in 1:iterations){
     cmd <- paste("python3 -W ignore rl_quantize.py --arch ",
                  network,
                  " --dataset imagenet --dataset_root data",
-                 " --suffix ratio010 --preserve_ratio 0.1",
+                 " --suffix ratio010 --preserve_ratio ",
+                 preserve_ratio,
                  " --n_worker 120 --warmup -1 --train_episode ",
                  sobol_n,
                  " --use_top5",
-                 " --data_bsize 128 --optimizer RS --val_size 10000",
+                 " --data_bsize ",
+                 batch_size,
+                 " --optimizer RS --val_size 10000",
                  " --train_size 20000",
                  sep = "")
 
@@ -257,11 +263,14 @@ for(i in 1:iterations){
         cmd <- paste("python3 -W ignore rl_quantize.py --arch ",
                      network,
                      " --dataset imagenet --dataset_root data",
-                     " --suffix ratio010 --preserve_ratio 0.1",
+                     " --suffix ratio010 --preserve_ratio ",
+                     preserve_ratio,
                      " --n_worker 120 --warmup -1 --train_episode ",
                      gpr_added_points + gpr_added_neighbours,
                      " --use_top5",
-                     " --data_bsize 128 --optimizer RS --val_size 10000",
+                     " --data_bsize ",
+                     batch_size,
+                     " --optimizer RS --val_size 10000",
                      " --train_size 20000",
                      sep = "")
 
