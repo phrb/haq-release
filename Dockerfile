@@ -30,8 +30,9 @@ RUN Rscript -e 'install.packages(c("rsm", "dplyr", "tidyr", "DiceKriging", "Dice
 RUN pip3 install wheel
 
 RUN pip3 install               \
-        'torch>=1.1'           \
-        'torchvision>=0.3.0'   \
+        'Pillow==6.1'          \
+        'torch==1.2'           \
+        'torchvision==0.4.0'   \
         'numpy>=1.14'          \
         'easydict>=1.8'        \
         'progress>=1.4'        \
