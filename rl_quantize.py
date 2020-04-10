@@ -176,6 +176,7 @@ if __name__ == "__main__":
     parser.add_argument('--train_episode', default=600, type=int, help='train iters each timestep')
     parser.add_argument('--epsilon', default=50000, type=int, help='linear decay of exploration policy')
     parser.add_argument('--seed', default=-1, type=int, help='')
+    parser.add_argument('--run_id', default=-1, type=int, help='')
     parser.add_argument('--n_worker', default=32, type=int, help='number of data loader worker')
     parser.add_argument('--data_bsize', default=256, type=int, help='number of data batch size')
     parser.add_argument('--finetune_epoch', default=1, type=int, help='')

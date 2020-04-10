@@ -21,7 +21,8 @@ class RS(object):
                                        window_length = args.window_length)
 
         # self.design = pd.read_csv("experimental_designs/sobol_resnet50_600_samples.csv")
-        self.design = pd.read_csv("current_design.csv")
+        self.design = pd.read_csv("current_design_{0}.csv",
+                                  args.run_id)
         print(str(self.design))
         self.design["Top1"] = float("inf")
         self.design["Top5"] = float("inf")

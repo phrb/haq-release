@@ -55,6 +55,8 @@ network_sizes <- read.csv(network_sizes_data)
 network_specs <- network_sizes %>%
     filter(id == network)
 
+run_id <- 100000 * runif(1)
+
 for(i in 1:iterations){
     gpr_sample <- NULL
     search_space <- NULL
@@ -83,7 +85,12 @@ for(i in 1:iterations){
                                       seq(1:(sobol_dim / 2)),
                                       sep = "")))
 
-    write.csv(df_design, "current_design.csv", row.names = FALSE)
+    write.csv(df_design,
+              paste("current_design_",
+                    run_id,
+                    ".csv",
+                    sep = ""),
+              row.names = FALSE)
 
     start_time <- as.integer(format(Sys.time(), "%s"))
 
@@ -95,6 +102,8 @@ for(i in 1:iterations){
                  " --n_worker 120 --warmup -1 --train_episode ",
                  sobol_n,
                  " --use_top5",
+                 " --run_id ",
+                 run_id,
                  " --data_bsize ",
                  batch_size,
                  " --optimizer RS --val_size 10000",
@@ -268,6 +277,8 @@ for(i in 1:iterations){
                      " --n_worker 120 --warmup -1 --train_episode ",
                      gpr_added_points + gpr_added_neighbours,
                      " --use_top5",
+                     " --run_id ",
+                     run_id,
                      " --data_bsize ",
                      batch_size,
                      " --optimizer RS --val_size 10000",
