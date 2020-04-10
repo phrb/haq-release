@@ -130,10 +130,10 @@ for(i in 1:iterations){
         size_df <- select(search_space, -Top5, -Top1)
         formulas <- character(length(names(size_df)))
 
-        for(i in 1:length(names(size_df))){
-            formulas[i] <- paste(names(size_df)[i],
+        for(k in 1:length(names(size_df))){
+            formulas[k] <- paste(names(size_df)[k],
                                  "e ~ round((7 * ",
-                                 names(size_df)[i],
+                                 names(size_df)[k],
                                  ") + 1)",
                                  sep = "")
         }
@@ -308,10 +308,10 @@ for(i in 1:iterations){
     size_df <- select(search_space, -Top5, -Top1)
     formulas <- character(length(names(size_df)))
 
-    for(i in 1:length(names(size_df))){
-        formulas[i] <- paste(names(size_df)[i],
+    for(k in 1:length(names(size_df))){
+        formulas[k] <- paste(names(size_df)[k],
                              "e ~ round((7 * ",
-                             names(size_df)[i],
+                             names(size_df)[k],
                              ") + 1)",
                              sep = "")
     }
