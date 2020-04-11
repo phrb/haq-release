@@ -120,7 +120,11 @@ for(i in 1:iterations){
 
     system("rm -r ../../save")
 
-    current_results <- read.csv("current_results.csv", header = TRUE)
+    current_results <- read.csv(paste("current_design_",
+                                      run_id,
+                                      ".csv",
+                                      sep = ""),
+                                header = TRUE)
 
     if(is.null(search_space)){
         search_space <- current_results
@@ -134,7 +138,9 @@ for(i in 1:iterations){
                     total_measurements,
                     "_samples_",
                     i,
-                    "_iteration_search_space.csv",
+                    "_iteration_id_",
+                    run_id,
+                    "_search_space.csv",
                     sep = ""),
               row.names = FALSE)
 
@@ -272,7 +278,12 @@ for(i in 1:iterations){
                                           seq(1:(sobol_dim / 2)),
                                           sep = "")))
 
-        write.csv(df_design, "current_design.csv", row.names = FALSE)
+        write.csv(df_design,
+                  paste("current_design_",
+                        run_id,
+                        ".csv",
+                        sep = ""),
+                  row.names = FALSE)
 
         cmd <- paste("CUDA_VISIBLE_DEVICES=",
                      cuda_device,
@@ -297,7 +308,11 @@ for(i in 1:iterations){
 
         system("rm -r ../../save")
 
-        current_results <- read.csv("current_results.csv", header = TRUE)
+        current_results <- read.csv(paste("current_design_",
+                                          run_id,
+                                          ".csv",
+                                          sep = ""),
+                                    header = TRUE)
 
         if(is.null(search_space)){
             search_space <- current_results
@@ -311,7 +326,9 @@ for(i in 1:iterations){
                         total_measurements,
                         "_samples_",
                         i,
-                        "_iteration_search_space.csv",
+                        "_iteration_id_",
+                        run_id,
+                        "_search_space.csv",
                         sep = ""),
                   row.names = FALSE)
     }
@@ -377,7 +394,9 @@ for(i in 1:iterations){
                     total_measurements,
                     "_samples_",
                     iterations,
-                    "_iterations.csv",
+                    "_iterations_id_",
+                    run_id,
+                    ".csv",
                     sep = ""),
               row.names = FALSE)
 }
