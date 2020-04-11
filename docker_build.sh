@@ -35,6 +35,7 @@ do
             ;;
         -r|--run)
             sudo docker run -d \
+                 --gpus all \
                  --ipc=host \
                  -it \
                  --name $CONTAINER \
@@ -46,6 +47,7 @@ do
         -rr|--random-run)
             NAME=$CONTAINER-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 5 | head -n 1)
             sudo docker run -d \
+                 --gpus all \
                  --ipc=host \
                  -it \
                  --name $NAME \
