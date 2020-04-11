@@ -8,6 +8,8 @@ library(future.apply)
 
 plan(multiprocess, workers = 256)
 
+args = commandArgs(trailingOnly = TRUE)
+
 quiet <- function(x) {
   sink(tempfile())
   on.exit(sink())
@@ -45,8 +47,8 @@ network <- "resnet50"
 network_sizes_data <- "network_sizes_data.csv"
 
 preserve_ratio <- 0.1
-batch_size <- 64
-cuda_device <- 0
+batch_size <- 128
+cuda_device <- as.integer(args[1])
 
 size_weight <- 1
 top1_weight <- 0
