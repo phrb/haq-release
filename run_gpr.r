@@ -55,7 +55,7 @@ network_sizes <- read.csv(network_sizes_data)
 network_specs <- network_sizes %>%
     filter(id == network)
 
-run_id <- 100000 * runif(1)
+run_id <- round(100000 * runif(1))
 
 for(i in 1:iterations){
     gpr_sample <- NULL
