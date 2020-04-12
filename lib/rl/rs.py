@@ -20,8 +20,10 @@ class RS(object):
         self.memory = SequentialMemory(limit = args.rmsize,
                                        window_length = args.window_length)
 
+        self.run_id = args.run_id
+
         # self.design = pd.read_csv("experimental_designs/sobol_resnet50_600_samples.csv")
-        self.design = pd.read_csv("current_design_{0}.csv".format(args.run_id))
+        self.design = pd.read_csv("current_design_{0}.csv".format(self.run_id))
         print(str(self.design))
         self.design["Top1"] = float("inf")
         self.design["Top5"] = float("inf")
@@ -78,7 +80,7 @@ class RS(object):
         self.episode_end = True
         self.design.at[self.current_row - 1, "Top1"] = top1
         self.design.at[self.current_row - 1, "Top5"] = top5
-        self.design.to_csv("current_results_{0}.csv".format(args.run_id),
+        self.design.to_csv("current_results_{0}.csv".format(self.run_id),
                            index = False)
 
     def reset(self, obs):
