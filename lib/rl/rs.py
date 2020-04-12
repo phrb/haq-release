@@ -78,7 +78,8 @@ class RS(object):
         self.episode_end = True
         self.design.at[self.current_row - 1, "Top1"] = top1
         self.design.at[self.current_row - 1, "Top5"] = top5
-        self.design.to_csv("current_results.csv", index = False)
+        self.design.to_csv("current_results_{0}.csv".format(args.run_id),
+                           index = False)
 
     def reset(self, obs):
         pass

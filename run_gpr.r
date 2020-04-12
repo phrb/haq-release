@@ -60,6 +60,15 @@ network_specs <- network_sizes %>%
 
 run_id <- round(100000 * runif(1))
 
+design <- NULL
+gpr_model <- NULL
+df_design <- NULL
+current_results <- NULL
+size_df <- NULL
+coded_size_df <- NULL
+new_sample <- NULL
+perturbation <- NULL
+
 for(i in 1:iterations){
     gpr_sample <- NULL
     search_space <- NULL
@@ -73,11 +82,21 @@ for(i in 1:iterations){
     rm(temp_sobol)
     quiet(gc())
 
+    if(!(is.null(design)) {
+        rm(design)
+        design <- NULL
+    }
+
     design <- sobol(n = sobol_n,
                     dim = sobol_dim,
                     scrambling = 1,
                     seed = as.integer((99999 - 10000) * runif(1) + 10000),
                     init = FALSE)
+
+    if(!(is.null(df_design)) {
+        rm(df_design)
+        df_design <- NULL
+    }
 
     df_design <- data.frame(design)
 
@@ -120,7 +139,12 @@ for(i in 1:iterations){
 
     system("rm -r ../../save")
 
-    current_results <- read.csv(paste("current_design_",
+    if(!(is.null(current_results)) {
+        rm(current_results)
+        current_results <- NULL
+    }
+
+    current_results <- read.csv(paste("current_results_",
                                       run_id,
                                       ".csv",
                                       sep = ""),
@@ -147,6 +171,11 @@ for(i in 1:iterations){
     for(j in 1:gpr_iterations){
         print("Starting reg")
 
+        if(!(is.null(size_df)) {
+            rm(size_df)
+            size_df <- NULL
+        }
+
         size_df <- select(search_space, -Top5, -Top1)
         formulas <- character(length(names(size_df)))
 
@@ -156,6 +185,11 @@ for(i in 1:iterations){
                                  names(size_df)[k],
                                  ") + 1)",
                                  sep = "")
+        }
+
+        if(!(is.null(coded_size_df)) {
+            rm(coded_size_df)
+            coded_size_df <- NULL
         }
 
         coded_size_df <- coded.data(size_df, formulas = lapply(formulas, formula))
@@ -177,6 +211,11 @@ for(i in 1:iterations){
         print("Coded weight df:")
         print(str(coded_size_df))
 
+        if(!(is.null(gpr_model)) {
+            rm(gpr_model)
+            gpr_model <- NULL
+        }
+
         #response = ((size_weight * rowSums(select(search_space, -Top5, -Top1)) / sobol_dim)) +
         gpr_model <- km(design = select(search_space, -Top5, -Top1),
                         response = ((size_weight * (coded_size_df$total_size_MB / coded_size_df$network_size_MB)) +
@@ -187,6 +226,12 @@ for(i in 1:iterations){
                                        BFGSburnin = 500))
 
         print("Generating Sample")
+
+        if(!(is.null(new_sample)) {
+            rm(new_sample)
+            new_sample <- NULL
+        }
+
         new_sample <- sobol(n = gpr_sample_size,
                             dim = sobol_dim,
                             scrambling = 1,
@@ -224,6 +269,12 @@ for(i in 1:iterations){
                                       -expected_improvement)
 
         print("Generating perturbation sample")
+
+        if(!(is.null(perturbation)) {
+            rm(perturbation)
+            perturbation <- NULL
+        }
+
         perturbation <- sobol(n = gpr_added_points * gpr_neighbourhood_factor,
                               dim = sobol_dim,
                               scrambling = 1,
@@ -308,7 +359,12 @@ for(i in 1:iterations){
 
         system("rm -r ../../save")
 
-        current_results <- read.csv(paste("current_design_",
+        if(!(is.null(current_results)) {
+            rm(current_results)
+            current_results <- NULL
+        }
+
+        current_results <- read.csv(paste("current_results_",
                                           run_id,
                                           ".csv",
                                           sep = ""),
