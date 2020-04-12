@@ -82,7 +82,7 @@ for(i in 1:iterations){
     rm(temp_sobol)
     quiet(gc())
 
-    if(!(is.null(design)) {
+    if(!(is.null(design))){
         rm(design)
         design <- NULL
     }
@@ -93,7 +93,7 @@ for(i in 1:iterations){
                     seed = as.integer((99999 - 10000) * runif(1) + 10000),
                     init = FALSE)
 
-    if(!(is.null(df_design)) {
+    if(!(is.null(df_design))){
         rm(df_design)
         df_design <- NULL
     }
@@ -139,7 +139,7 @@ for(i in 1:iterations){
 
     system("rm -r ../../save")
 
-    if(!(is.null(current_results)) {
+    if(!(is.null(current_results))){
         rm(current_results)
         current_results <- NULL
     }
@@ -171,7 +171,7 @@ for(i in 1:iterations){
     for(j in 1:gpr_iterations){
         print("Starting reg")
 
-        if(!(is.null(size_df)) {
+        if(!(is.null(size_df))){
             rm(size_df)
             size_df <- NULL
         }
@@ -187,7 +187,7 @@ for(i in 1:iterations){
                                  sep = "")
         }
 
-        if(!(is.null(coded_size_df)) {
+        if(!(is.null(coded_size_df))){
             rm(coded_size_df)
             coded_size_df <- NULL
         }
@@ -211,7 +211,7 @@ for(i in 1:iterations){
         print("Coded weight df:")
         print(str(coded_size_df))
 
-        if(!(is.null(gpr_model)) {
+        if(!(is.null(gpr_model))){
             rm(gpr_model)
             gpr_model <- NULL
         }
@@ -227,7 +227,7 @@ for(i in 1:iterations){
 
         print("Generating Sample")
 
-        if(!(is.null(new_sample)) {
+        if(!(is.null(new_sample))){
             rm(new_sample)
             new_sample <- NULL
         }
@@ -270,7 +270,7 @@ for(i in 1:iterations){
 
         print("Generating perturbation sample")
 
-        if(!(is.null(perturbation)) {
+        if(!(is.null(perturbation))){
             rm(perturbation)
             perturbation <- NULL
         }
@@ -359,7 +359,7 @@ for(i in 1:iterations){
 
         system("rm -r ../../save")
 
-        if(!(is.null(current_results)) {
+        if(!(is.null(current_results))){
             rm(current_results)
             current_results <- NULL
         }
