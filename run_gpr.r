@@ -31,7 +31,7 @@ sobol_n <- starting_sobol_n
 
 bit_min <- 1
 bit_max <- 8
-perturbation_range <- 2 * (bit_min / bit_max)
+perturbation_range <- 3 * (bit_min / bit_max)
 
 gpr_iterations <- 20
 gpr_added_points <- 3
@@ -68,10 +68,18 @@ size_df <- NULL
 coded_size_df <- NULL
 new_sample <- NULL
 perturbation <- NULL
+gpr_sample <- NULL
+search_space <- NULL
 
 for(i in 1:iterations){
-    gpr_sample <- NULL
-    search_space <- NULL
+    if(!(is.null(gpr_sample))){
+        rm(gpr_sample)
+        gpr_sample <- NULL
+    }
+    if(!(is.null(search_space))){
+        rm(search_space)
+        search_space <- NULL
+    }
 
     temp_sobol <- sobol(n = sobol_n,
                         dim = sobol_dim,
@@ -89,7 +97,7 @@ for(i in 1:iterations){
 
     design <- sobol(n = sobol_n,
                     dim = sobol_dim,
-                    scrambling = 1,
+                    scrambling = 2,
                     seed = as.integer((99999 - 10000) * runif(1) + 10000),
                     init = FALSE)
 
@@ -217,7 +225,8 @@ for(i in 1:iterations){
         }
 
         #response = ((size_weight * rowSums(select(search_space, -Top5, -Top1)) / sobol_dim)) +
-        gpr_model <- km(design = select(search_space, -Top5, -Top1),
+        gpr_model <- km(formula = y ~ .,
+                        design = select(search_space, -Top5, -Top1),
                         response = ((size_weight * (coded_size_df$total_size_MB / coded_size_df$network_size_MB)) +
                                     (top1_weight * ((100.0 - search_space$Top1) / 100.0)) +
                                     (top5_weight * ((100.0 - search_space$Top5) / 100.0))) /
@@ -234,7 +243,7 @@ for(i in 1:iterations){
 
         new_sample <- sobol(n = gpr_sample_size,
                             dim = sobol_dim,
-                            scrambling = 1,
+                            scrambling = 2,
                             seed = as.integer((99999 - 10000) * runif(1) + 10000),
                             init = FALSE)
 
@@ -277,7 +286,7 @@ for(i in 1:iterations){
 
         perturbation <- sobol(n = gpr_added_points * gpr_neighbourhood_factor,
                               dim = sobol_dim,
-                              scrambling = 1,
+                              scrambling = 2,
                               seed = as.integer((99999 - 10000) * runif(1) + 10000),
                               init = FALSE)
 
