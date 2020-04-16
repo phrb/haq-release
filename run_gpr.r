@@ -26,7 +26,7 @@ sobol_dim <- 54 * 2
 # vgg19
 # sobol_dim <- 19 * 2
 
-starting_sobol_n <- (1 * sobol_dim) + 1
+starting_sobol_n <- (2 * sobol_dim) + 1
 sobol_n <- starting_sobol_n
 
 bit_min <- 1
