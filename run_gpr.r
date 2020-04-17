@@ -26,14 +26,14 @@ sobol_dim <- 54 * 2
 # vgg19
 # sobol_dim <- 19 * 2
 
-starting_sobol_n <- (2 * sobol_dim) + 1
+starting_sobol_n <- (1 * sobol_dim) + 1
 sobol_n <- starting_sobol_n
 
 bit_min <- 1
 bit_max <- 8
 perturbation_range <- 3 * (bit_min / bit_max)
 
-gpr_iterations <- 20
+gpr_iterations <- 40
 gpr_added_points <- 3
 
 gpr_added_neighbours <- 2
