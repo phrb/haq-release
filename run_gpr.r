@@ -58,8 +58,6 @@ network_sizes <- read.csv(network_sizes_data)
 network_specs <- network_sizes %>%
     filter(id == network)
 
-run_id <- round(100000 * runif(1))
-
 design <- NULL
 gpr_model <- NULL
 df_design <- NULL
@@ -72,18 +70,22 @@ gpr_sample <- NULL
 search_space <- NULL
 
 for(i in 1:iterations){
+    run_id <- round(100000 * runif(1))
+
     if(!(is.null(gpr_sample))){
         rm(gpr_sample)
+        quiet(gc())
         gpr_sample <- NULL
     }
     if(!(is.null(search_space))){
         rm(search_space)
+        quiet(gc())
         search_space <- NULL
     }
 
     temp_sobol <- sobol(n = sobol_n,
                         dim = sobol_dim,
-                        scrambling = 1,
+                        scrambling = 2,
                         seed = as.integer((99999 - 10000) * runif(1) + 10000),
                         init = TRUE)
 
@@ -92,6 +94,7 @@ for(i in 1:iterations){
 
     if(!(is.null(design))){
         rm(design)
+        quiet(gc())
         design <- NULL
     }
 
@@ -103,6 +106,7 @@ for(i in 1:iterations){
 
     if(!(is.null(df_design))){
         rm(df_design)
+        quiet(gc())
         df_design <- NULL
     }
 
@@ -149,6 +153,7 @@ for(i in 1:iterations){
 
     if(!(is.null(current_results))){
         rm(current_results)
+        quiet(gc())
         current_results <- NULL
     }
 
@@ -181,6 +186,7 @@ for(i in 1:iterations){
 
         if(!(is.null(size_df))){
             rm(size_df)
+            quiet(gc())
             size_df <- NULL
         }
 
@@ -197,6 +203,7 @@ for(i in 1:iterations){
 
         if(!(is.null(coded_size_df))){
             rm(coded_size_df)
+            quiet(gc())
             coded_size_df <- NULL
         }
 
@@ -221,6 +228,7 @@ for(i in 1:iterations){
 
         if(!(is.null(gpr_model))){
             rm(gpr_model)
+            quiet(gc())
             gpr_model <- NULL
         }
 
@@ -238,6 +246,7 @@ for(i in 1:iterations){
 
         if(!(is.null(new_sample))){
             rm(new_sample)
+            quiet(gc())
             new_sample <- NULL
         }
 
@@ -281,6 +290,7 @@ for(i in 1:iterations){
 
         if(!(is.null(perturbation))){
             rm(perturbation)
+            quiet(gc())
             perturbation <- NULL
         }
 
@@ -370,6 +380,7 @@ for(i in 1:iterations){
 
         if(!(is.null(current_results))){
             rm(current_results)
+            quiet(gc())
             current_results <- NULL
         }
 
