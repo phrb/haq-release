@@ -344,8 +344,8 @@ for(i in 1:iterations){
         #                                                          EI,
         #                                                          gpr_model)
 
-        pred <- predict(gpr_model, gpr_sample, "UK")
-        gpr_sample$expected_improvement <- pred$mean - (1.96 * pred$sd)
+        pred <- predict(gpr_model, gpr_selected_points, "UK")
+        gpr_selected_points$expected_improvement <- pred$mean - (1.96 * pred$sd)
 
         gpr_selected_points <- gpr_selected_points %>%
             arrange(desc(expected_improvement))
