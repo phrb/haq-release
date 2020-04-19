@@ -49,7 +49,7 @@ network_sizes_data <- "network_sizes_data.csv"
 preserve_ratio <- 0.1
 batch_size <- 128
 cuda_device <- as.integer(args[1])
-resume_run <- as.integer(args[2])
+resume_run_id <- as.integer(args[2])
 
 size_weight <- 1
 top1_weight <- 0
