@@ -282,10 +282,12 @@ for(i in 1:iterations){
         }
 
         print("Computing EI")
-        gpr_sample$expected_improvement <- future_apply(gpr_sample,
-                                                        1,
-                                                        EI,
-                                                        gpr_model)
+        # gpr_sample$expected_improvement <- future_apply(gpr_sample,
+        #                                                 1,
+        #                                                 EI,
+        #                                                 gpr_model)
+        pred <- predict(gpr_model, gpr_sample, "UK")
+        gpr_sample$expected_improvement <- pred$mean - (1.96 * pred$sd)
 
         gpr_selected_points <- gpr_sample %>%
             arrange(desc(expected_improvement))
@@ -337,10 +339,13 @@ for(i in 1:iterations){
             distinct()
 
         print("Computing perturbed EI")
-        gpr_selected_points$expected_improvement <- future_apply(gpr_selected_points,
-                                                                 1,
-                                                                 EI,
-                                                                 gpr_model)
+        # gpr_selected_points$expected_improvement <- future_apply(gpr_selected_points,
+        #                                                          1,
+        #                                                          EI,
+        #                                                          gpr_model)
+
+        pred <- predict(gpr_model, gpr_sample, "UK")
+        gpr_sample$expected_improvement <- pred$mean - (1.96 * pred$sd)
 
         gpr_selected_points <- gpr_selected_points %>%
             arrange(desc(expected_improvement))
