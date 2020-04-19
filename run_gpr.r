@@ -84,20 +84,21 @@ for(i in 1:iterations){
 
     start_time <- as.integer(format(Sys.time(), "%s"))
 
+    temp_sobol <- sobol(n = sobol_n,
+                        dim = sobol_dim,
+                        scrambling = 2,
+                        seed = as.integer((99999 - 10000) * runif(1) + 10000),
+                        init = TRUE)
+
+    rm(temp_sobol)
+    quiet(gc())
+
+
     if(i == 1 && resume_run_id != -1){
         print(paste("Resuming run:", resume_run_id))
         run_id <- resume_run_id
     } else{
         run_id <- round(100000 * runif(1))
-
-        temp_sobol <- sobol(n = sobol_n,
-                            dim = sobol_dim,
-                            scrambling = 2,
-                            seed = as.integer((99999 - 10000) * runif(1) + 10000),
-                            init = TRUE)
-
-        rm(temp_sobol)
-        quiet(gc())
 
         if(!(is.null(design))){
             rm(design)
