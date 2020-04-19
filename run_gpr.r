@@ -31,7 +31,7 @@ sobol_n <- starting_sobol_n
 
 bit_min <- 1
 bit_max <- 8
-perturbation_range <- 3 * (bit_min / bit_max)
+perturbation_range <- 4 * (bit_min / bit_max)
 
 gpr_iterations <- 40
 gpr_added_points <- 3
@@ -39,7 +39,7 @@ gpr_added_points <- 3
 gpr_added_neighbours <- 2
 gpr_neighbourhood_factor <- 1000
 
-gpr_sample_size <- 200 * sobol_dim
+gpr_sample_size <- 50 * sobol_dim
 
 total_measurements <- starting_sobol_n + (gpr_iterations * (gpr_added_points + gpr_added_neighbours))
 
@@ -275,7 +275,8 @@ for(i in 1:iterations){
                                            sep = "")))
 
         if(is.null(gpr_sample)){
-            gpr_sample <- new_sample
+            gpr_sample <- new_sample %>%
+                distinct()
         } else{
             gpr_sample <- bind_rows(gpr_sample, new_sample) %>%
                 distinct()
