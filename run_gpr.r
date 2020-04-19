@@ -247,7 +247,6 @@ for(i in 1:iterations){
         gpr_model <- km(formula = ~ .,
                         design = select(search_space, -Top5, -Top1),
                         response = y,
-                        nugget = 1e-8 * var(y),
                         control = list(pop.size = 400,
                                        BFGSburnin = 500))
 
@@ -283,7 +282,7 @@ for(i in 1:iterations){
         }
 
         print("Computing EI")
-        gpr_sample$expected_improvement <- future_apply(1e-5 + gpr_sample,
+        gpr_sample$expected_improvement <- future_apply(gpr_sample,
                                                         1,
                                                         EI,
                                                         gpr_model)
