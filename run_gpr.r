@@ -26,7 +26,7 @@ sobol_dim <- 54 * 2
 # vgg19
 # sobol_dim <- 19 * 2
 
-starting_sobol_n <- (1 * sobol_dim) + 1
+starting_sobol_n <- (1 * sobol_dim) + 10
 sobol_n <- starting_sobol_n
 
 bit_min <- 1
@@ -52,8 +52,8 @@ cuda_device <- as.integer(args[1])
 resume_run_id <- as.integer(args[2])
 
 size_weight <- 1
-top1_weight <- 0
-top5_weight <- 0
+top1_weight <- 0.2
+top5_weight <- 0.8
 
 network_sizes <- read.csv(network_sizes_data)
 network_specs <- network_sizes %>%
