@@ -247,6 +247,7 @@ for(i in 1:iterations){
         gpr_model <- km(formula = ~ .,
                         design = select(search_space, -Top5, -Top1),
                         response = y,
+                        nugget = 1e-8 * var(y),
                         control = list(pop.size = 400,
                                        BFGSburnin = 500))
 
