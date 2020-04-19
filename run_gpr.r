@@ -49,6 +49,7 @@ network_sizes_data <- "network_sizes_data.csv"
 preserve_ratio <- 0.1
 batch_size <- 128
 cuda_device <- as.integer(args[1])
+resume_run <- as.integer(args[2])
 
 size_weight <- 1
 top1_weight <- 0
@@ -70,8 +71,6 @@ gpr_sample <- NULL
 search_space <- NULL
 
 for(i in 1:iterations){
-    run_id <- round(100000 * runif(1))
-
     if(!(is.null(gpr_sample))){
         rm(gpr_sample)
         quiet(gc())
@@ -83,73 +82,80 @@ for(i in 1:iterations){
         search_space <- NULL
     }
 
-    temp_sobol <- sobol(n = sobol_n,
+    start_time <- as.integer(format(Sys.time(), "%s"))
+
+    if(i == 1 && resume_run_id != -1){
+        print(paste("Resuming run:", resume_run_id))
+        run_id <- resume_run_id
+    } else{
+        run_id <- round(100000 * runif(1))
+
+        temp_sobol <- sobol(n = sobol_n,
+                            dim = sobol_dim,
+                            scrambling = 2,
+                            seed = as.integer((99999 - 10000) * runif(1) + 10000),
+                            init = TRUE)
+
+        rm(temp_sobol)
+        quiet(gc())
+
+        if(!(is.null(design))){
+            rm(design)
+            quiet(gc())
+            design <- NULL
+        }
+
+        design <- sobol(n = sobol_n,
                         dim = sobol_dim,
                         scrambling = 2,
                         seed = as.integer((99999 - 10000) * runif(1) + 10000),
-                        init = TRUE)
+                        init = FALSE)
 
-    rm(temp_sobol)
-    quiet(gc())
+        if(!(is.null(df_design))){
+            rm(df_design)
+            quiet(gc())
+            df_design <- NULL
+        }
 
-    if(!(is.null(design))){
-        rm(design)
-        quiet(gc())
-        design <- NULL
+        df_design <- data.frame(design)
+
+        names(df_design) <- c(rbind(paste("W",
+                                          seq(1:(sobol_dim / 2)),
+                                          sep = ""),
+                                    paste("A",
+                                          seq(1:(sobol_dim / 2)),
+                                          sep = "")))
+
+        write.csv(df_design,
+                  paste("current_design_",
+                        run_id,
+                        ".csv",
+                        sep = ""),
+                  row.names = FALSE)
+
+        cmd <- paste("CUDA_VISIBLE_DEVICES=",
+                     cuda_device,
+                     " python3 -W ignore rl_quantize.py --arch ",
+                     network,
+                     " --dataset imagenet --dataset_root data",
+                     " --suffix ratio010 --preserve_ratio ",
+                     preserve_ratio,
+                     " --n_worker 120 --warmup -1 --train_episode ",
+                     sobol_n,
+                     " --use_top5",
+                     " --run_id ",
+                     run_id,
+                     " --data_bsize ",
+                     batch_size,
+                     " --optimizer RS --val_size 10000",
+                     " --train_size 20000",
+                     sep = "")
+
+        print(cmd)
+        system(cmd)
+
+        system("rm -r ../../save")
     }
-
-    design <- sobol(n = sobol_n,
-                    dim = sobol_dim,
-                    scrambling = 2,
-                    seed = as.integer((99999 - 10000) * runif(1) + 10000),
-                    init = FALSE)
-
-    if(!(is.null(df_design))){
-        rm(df_design)
-        quiet(gc())
-        df_design <- NULL
-    }
-
-    df_design <- data.frame(design)
-
-    names(df_design) <- c(rbind(paste("W",
-                                      seq(1:(sobol_dim / 2)),
-                                      sep = ""),
-                                paste("A",
-                                      seq(1:(sobol_dim / 2)),
-                                      sep = "")))
-
-    write.csv(df_design,
-              paste("current_design_",
-                    run_id,
-                    ".csv",
-                    sep = ""),
-              row.names = FALSE)
-
-    start_time <- as.integer(format(Sys.time(), "%s"))
-
-    cmd <- paste("CUDA_VISIBLE_DEVICES=",
-                 cuda_device,
-                 " python3 -W ignore rl_quantize.py --arch ",
-                 network,
-                 " --dataset imagenet --dataset_root data",
-                 " --suffix ratio010 --preserve_ratio ",
-                 preserve_ratio,
-                 " --n_worker 120 --warmup -1 --train_episode ",
-                 sobol_n,
-                 " --use_top5",
-                 " --run_id ",
-                 run_id,
-                 " --data_bsize ",
-                 batch_size,
-                 " --optimizer RS --val_size 10000",
-                 " --train_size 20000",
-                 sep = "")
-
-    print(cmd)
-    system(cmd)
-
-    system("rm -r ../../save")
 
     if(!(is.null(current_results))){
         rm(current_results)
@@ -232,13 +238,15 @@ for(i in 1:iterations){
             gpr_model <- NULL
         }
 
-        #response = ((size_weight * rowSums(select(search_space, -Top5, -Top1)) / sobol_dim)) +
-        gpr_model <- km(formula = y ~ .,
+        y <- ((size_weight * (coded_size_df$total_size_MB / coded_size_df$network_size_MB)) +
+              (top1_weight * ((100.0 - search_space$Top1) / 100.0)) +
+              (top5_weight * ((100.0 - search_space$Top5) / 100.0))) /
+            (size_weight + top1_weight + top5_weight),
+
+        gpr_model <- km(formula = ~ .,
                         design = select(search_space, -Top5, -Top1),
-                        response = ((size_weight * (coded_size_df$total_size_MB / coded_size_df$network_size_MB)) +
-                                    (top1_weight * ((100.0 - search_space$Top1) / 100.0)) +
-                                    (top5_weight * ((100.0 - search_space$Top5) / 100.0))) /
-                            (size_weight + top1_weight + top5_weight),
+                        response = y,
+                        nugget = = 1e-8 * var(y),
                         control = list(pop.size = 400,
                                        BFGSburnin = 500))
 
