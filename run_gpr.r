@@ -282,7 +282,7 @@ for(i in 1:iterations){
         }
 
         print("Computing EI")
-        gpr_sample$expected_improvement <- future_apply(gpr_sample,
+        gpr_sample$expected_improvement <- future_apply(1e-5 + gpr_sample,
                                                         1,
                                                         EI,
                                                         gpr_model)
