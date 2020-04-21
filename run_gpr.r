@@ -31,7 +31,7 @@ sobol_n <- starting_sobol_n
 
 bit_min <- 1
 bit_max <- 8
-perturbation_range <- 4 * (bit_min / bit_max)
+perturbation_range <- 2 * (bit_min / bit_max)
 
 gpr_iterations <- 40
 gpr_added_points <- 3
@@ -202,7 +202,7 @@ for(i in 1:iterations){
 
         for(k in 1:length(names(size_df))){
             formulas[k] <- paste(names(size_df)[k],
-                                 "e ~ round((7 * ",
+                                 "e ~ trunc((8 * ",
                                  names(size_df)[k],
                                  ") + 1)",
                                  sep = "")
@@ -283,15 +283,19 @@ for(i in 1:iterations){
         }
 
         print("Computing EI")
+        # Using the EI function from DiceOptim:
         # gpr_sample$expected_improvement <- future_apply(gpr_sample,
         #                                                 1,
         #                                                 EI,
         #                                                 gpr_model)
+        # gpr_selected_points <- gpr_sample %>%
+        #     arrange(desc(expected_improvement))
+
         pred <- predict(gpr_model, gpr_sample, "UK")
         gpr_sample$expected_improvement <- pred$mean - (1.96 * pred$sd)
 
         gpr_selected_points <- gpr_sample %>%
-            arrange(desc(expected_improvement))
+            arrange(expected_improvement)
 
         gpr_sample <- select(gpr_sample, -expected_improvement)
 
@@ -340,16 +344,20 @@ for(i in 1:iterations){
             distinct()
 
         print("Computing perturbed EI")
+
+        # Using EI from DiceOptim:
         # gpr_selected_points$expected_improvement <- future_apply(gpr_selected_points,
         #                                                          1,
         #                                                          EI,
         #                                                          gpr_model)
+        # gpr_selected_points <- gpr_selected_points %>%
+        #     arrange(desc(expected_improvement))
 
         pred <- predict(gpr_model, gpr_selected_points, "UK")
         gpr_selected_points$expected_improvement <- pred$mean - (1.96 * pred$sd)
 
         gpr_selected_points <- gpr_selected_points %>%
-            arrange(desc(expected_improvement))
+            arrange(expected_improvement)
 
         gpr_selected_points <- select(gpr_selected_points[1:(gpr_added_points +
                                                              gpr_added_neighbours), ],
@@ -436,7 +444,7 @@ for(i in 1:iterations){
 
     for(k in 1:length(names(size_df))){
         formulas[k] <- paste(names(size_df)[k],
-                             "e ~ round((7 * ",
+                             "e ~ trunc((8 * ",
                              names(size_df)[k],
                              ") + 1)",
                              sep = "")
