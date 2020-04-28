@@ -226,7 +226,7 @@ class QuantizeEnv:
         min_bit, max_bit = self.bound_list[self.cur_ind]
         lbound, rbound = min_bit - 0.5, max_bit + 0.5  # same stride length for each bit
         action = (rbound - lbound) * action + lbound
-        action = int(np.round(action, 0))
+        action = int(np.trunc(action))
         self.last_action = action
         return action  # not constrained here
 
