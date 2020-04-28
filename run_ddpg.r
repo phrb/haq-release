@@ -1,5 +1,7 @@
 library(dplyr)
 
+args = commandArgs(trailingOnly = TRUE)
+
 quiet <- function(x) {
   sink(tempfile())
   on.exit(sink())
@@ -15,10 +17,7 @@ network <- "resnet50"
 preserve_ratio <- 0.1
 batch_size <- 128
 cuda_device <- as.integer(args[1])
-resume_run_id <- as.integer(args[2])
 warmup = 108
-
-cuda_device <- as.integer(args[1])
 
 for(i in 1:iterations){
     run_id <- round(100000 * runif(1))
