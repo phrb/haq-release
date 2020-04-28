@@ -11,7 +11,7 @@ quiet <- function(x) {
 iterations <- 2
 results <- NULL
 
-total_measurements <- 1 * 108
+total_measurements <- 2 * 108
 
 network <- "resnet50"
 preserve_ratio <- 0.1
@@ -34,7 +34,7 @@ for(i in 1:iterations){
                  preserve_ratio,
                  " --n_worker 120 --warmup ",
                  warmup,
-                 "--train_episode ",
+                 " --train_episode ",
                  total_measurements,
                  " --use_top5",
                  " --run_id ",
