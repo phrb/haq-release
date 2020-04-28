@@ -57,6 +57,8 @@ class QuantizeEnv:
         self.is_imagenet = ('imagenet' in data)
         self.use_top5 = args.use_top5
 
+        self.run_id = args.run_id
+
         # sanity check
         assert self.compress_ratio > self.min_bit * 1. / self.float_bit, \
             'Error! You can make achieve compress_ratio smaller than min_bit!'
@@ -154,7 +156,8 @@ class QuantizeEnv:
             search_space_dict["Top5"] = [top_accs["top5"]]
 
             self.search_space = self.search_space.append(pd.DataFrame(search_space_dict))
-            self.search_space.to_csv("haq_results_log.csv", index = False)
+            self.search_space.to_csv("haq_results_log_{}.csv".format(self.run_id),
+                                     index = False)
 
             if reward > self.best_reward:
                 self.best_reward = reward

@@ -9,22 +9,40 @@ quiet <- function(x) {
 iterations <- 2
 results <- NULL
 
-total_measurements <- 2 * 2 * 19
+total_measurements <- 1 * 108
 
-network <- "vgg19"
+network <- "resnet50"
+preserve_ratio <- 0.1
+batch_size <- 128
+cuda_device <- as.integer(args[1])
+resume_run_id <- as.integer(args[2])
+warmup = 108
+
+cuda_device <- as.integer(args[1])
 
 for(i in 1:iterations){
+    run_id <- round(100000 * runif(1))
+
     search_space <- NULL
     start_time <- as.integer(format(Sys.time(), "%s"))
 
-    cmd <- paste("python3 -W ignore rl_quantize.py --arch ",
+    cmd <- paste("CUDA_VISIBLE_DEVICES=",
+                 cuda_device,
+                 " python3 -W ignore rl_quantize.py --arch ",
                  network,
                  " --dataset imagenet --dataset_root data",
-                 " --suffix ratio010 --preserve_ratio 0.1",
-                 " --n_worker 120 --warmup 2 --train_episode ",
+                 " --suffix ratio010 --preserve_ratio ",
+                 preserve_ratio,
+                 " --n_worker 120 --warmup ",
+                 warmup,
+                 "--train_episode ",
                  total_measurements,
                  " --use_top5",
-                 " --data_bsize 128 --optimizer DDPG --val_size 10000",
+                 " --run_id ",
+                 run_id,
+                 " --data_bsize ",
+                 batch_size,
+                 " --optimizer RS --val_size 10000",
                  " --train_size 20000",
                  sep = "")
 
@@ -35,7 +53,11 @@ for(i in 1:iterations){
 
     elapsed_time <- as.integer(format(Sys.time(), "%s")) - start_time
 
-    current_results <- read.csv("haq_results_log.csv", header = TRUE)
+    current_results <- read.csv(paste("haq_results_log_",
+                                      run_id,
+                                      ".csv",
+                                      sep = ""),
+                                header = TRUE)
 
     if(is.null(search_space)){
         search_space <- current_results
@@ -49,7 +71,9 @@ for(i in 1:iterations){
                     total_measurements,
                     "_samples_",
                     i,
-                    "_iteration_search_space.csv",
+                    "_iteration_run_id_",
+                    run_id,
+                    "_search_space.csv",
                     sep = ""),
               row.names = FALSE)
 

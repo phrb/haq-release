@@ -39,7 +39,7 @@ gpr_added_points <- 3
 gpr_added_neighbours <- 2
 gpr_neighbourhood_factor <- 1000
 
-gpr_sample_size <- 80 * sobol_dim
+gpr_sample_size <- 40 * sobol_dim
 
 total_measurements <- starting_sobol_n + (gpr_iterations * (gpr_added_points + gpr_added_neighbours))
 
