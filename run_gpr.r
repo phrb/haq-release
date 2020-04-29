@@ -332,8 +332,8 @@ for(i in 1:iterations){
 
         gpr_selected_neighbourhood <- gpr_selected_neighbourhood + perturbation
 
-        gpr_selected_neighbourhood[gpr_selected_neighbourhood < 0.0] <- 0.124
-        gpr_selected_neighbourhood[gpr_selected_neighbourhood > 1.0] <- 0.876
+        gpr_selected_neighbourhood[gpr_selected_neighbourhood < 0.0] <- 0.1
+        gpr_selected_neighbourhood[gpr_selected_neighbourhood > 1.0] <- 0.9
 
         gpr_sample <- bind_rows(gpr_sample, gpr_selected_neighbourhood) %>%
             distinct()

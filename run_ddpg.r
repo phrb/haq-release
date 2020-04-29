@@ -41,7 +41,7 @@ for(i in 1:iterations){
                  run_id,
                  " --data_bsize ",
                  batch_size,
-                 " --optimizer RS --val_size 10000",
+                 " --optimizer DDPG --val_size 10000",
                  " --train_size 20000",
                  sep = "")
 
