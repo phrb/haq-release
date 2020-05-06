@@ -56,8 +56,8 @@ class Critic(nn.Module):
 class DDPG(object):
     def __init__(self, nb_states, nb_actions, args):
 
-        if args.seed > 0:
-            self.seed(args.seed)
+        # if args.seed > 0:
+        #     self.seed(args.seed)
 
         self.nb_states = nb_states
         self.nb_actions = nb_actions

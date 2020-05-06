@@ -210,10 +210,10 @@ if __name__ == "__main__":
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
     assert torch.cuda.is_available(), 'CUDA is needed for CNN'
 
-    if args.seed > 0:
-        np.random.seed(args.seed)
-        torch.manual_seed(args.seed)
-        torch.cuda.manual_seed_all(args.seed)
+    # if args.seed > 0:
+    #     np.random.seed(args.seed)
+    #     torch.manual_seed(args.seed)
+    #     torch.cuda.manual_seed_all(args.seed)
 
     model = models.__dict__[args.arch](pretrained=True)
     if args.arch.startswith('alexnet') or args.arch.startswith('vgg'):
