@@ -68,7 +68,7 @@ class RS(object):
                                                    self.current_column + 1]]
 
             self.current_column += 2
-            if self.current_column >= self.design.shape[1] - 2:
+            if self.current_column >= self.design.shape[1] - 4:
                 self.current_column = 0
                 self.current_row += 1
         else:
@@ -78,7 +78,7 @@ class RS(object):
             self.current_action = self.design.iat[self.current_row, self.current_column]
 
             self.current_column += 1
-            if self.current_column >= self.design.shape[1] - 1:
+            if self.current_column >= self.design.shape[1] - 4:
                 self.current_column = 0
                 self.current_row += 1
 

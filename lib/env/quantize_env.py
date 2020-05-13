@@ -84,6 +84,8 @@ class QuantizeEnv:
 
         search_space_dict["Top1"] = []
         search_space_dict["Top5"] = []
+        search_space_dict["Size"] = []
+        search_space_dict["SizeRatio"] = []
 
         self.search_space = pd.DataFrame(search_space_dict)
 
