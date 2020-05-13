@@ -77,7 +77,9 @@ class QuantizeEnv:
         search_space_dict = {}
 
         for i in range(len(self.quantizable_idx)):
-            for j in ["W", "A"]:
+            # For double bit quantization:
+            #for j in ["W", "A"]:
+            for j in ["W"]:
                 search_space_dict["{0}{1}".format(j, i + 1)] = []
 
         search_space_dict["Top1"] = []
@@ -149,8 +151,11 @@ class QuantizeEnv:
             search_space_dict = {}
 
             for i in range(len(self.strategy)):
-                search_space_dict["W{0}".format(i + 1)] = [self.strategy[i][0]]
-                search_space_dict["A{0}".format(i + 1)] = [self.strategy[i][1]]
+                search_space_dict["W{0}".format(i + 1)] = [self.strategy[i]]
+
+                # For double-bit quantization:
+                # search_space_dict["W{0}".format(i + 1)] = [self.strategy[i][0]]
+                # search_space_dict["A{0}".format(i + 1)] = [self.strategy[i][1]]
 
             search_space_dict["Top1"] = [top_accs["top1"]]
             search_space_dict["Top5"] = [top_accs["top5"]]
