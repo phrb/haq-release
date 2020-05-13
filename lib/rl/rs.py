@@ -56,7 +56,7 @@ class RS(object):
         print("design shape: [rows: {0}, cols: {1}]".format(self.design.shape[0],
                                                             self.design.shape[1]))
 
-        if double_bits:
+        if self.double_bits:
             print("accessed rows: [{0}, {1}], [{2}, {3}]".format(self.current_row,
                                                                  self.current_column,
                                                                  self.current_row,
