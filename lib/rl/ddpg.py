@@ -188,7 +188,10 @@ class DDPG(object):
     def random_action(self):
         action = np.random.uniform(self.lbound, self.rbound, self.nb_actions)
         # self.a_t = action
-        return list(action)
+        if self.nb_actions > 1:
+            return list(action)
+        else:
+            return action
 
     def select_action(self, s_t, episode, decay_epsilon=True):
         # assert episode >= self.warmup, 'Episode: {} warmup: {}'.format(episode, self.warmup)
@@ -201,7 +204,10 @@ class DDPG(object):
         # update for log
         self.delta = delta
         # self.a_t = action
-        return list(action)
+        if self.nb_actions > 1:
+            return list(action)
+        else:
+            return action
 
     def reset(self, obs):
         pass
@@ -229,10 +235,10 @@ class DDPG(object):
             '{}/critic.pkl'.format(output)
         )
 
-    def seed(self, s):
-        torch.manual_seed(s)
-        if USE_CUDA:
-            torch.cuda.manual_seed(s)
+    # def seed(self, s):
+        # torch.manual_seed(s)
+        # if USE_CUDA:
+        #     torch.cuda.manual_seed(s)
 
     def soft_update(self, target, source):
         for target_param, param in zip(target.parameters(), source.parameters()):

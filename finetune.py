@@ -97,12 +97,12 @@ os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
 use_cuda = torch.cuda.is_available()
 
 # Random seed
-if args.manualSeed is None:
-    args.manualSeed = random.randint(1, 10000)
-random.seed(args.manualSeed)
-torch.manual_seed(args.manualSeed)
-if use_cuda:
-    torch.cuda.manual_seed_all(args.manualSeed)
+# if args.manualSeed is None:
+#     args.manualSeed = random.randint(1, 10000)
+# random.seed(args.manualSeed)
+# torch.manual_seed(args.manualSeed)
+# if use_cuda:
+    # torch.cuda.manual_seed_all(args.manualSeed)
 
 
 best_acc = 0  # best test accuracy
@@ -368,4 +368,3 @@ if __name__ == '__main__':
 
     print('Best acc:')
     print(best_acc)
-

@@ -80,7 +80,10 @@ def train(num_episode, agent, env, output, debug=False):
 
         if done:  # end of episode
             if args.optimizer == "RS":
-                agent.save_accuracy(info["top1"], info["top5"])
+                agent.save_accuracy(info["top1"],
+                                    info["top5"],
+                                    info["w_size"],
+                                    info["w_ratio"])
                 agent.episode_end = True
 
             if debug:
@@ -230,7 +233,7 @@ if __name__ == "__main__":
                       batch_size=args.data_bsize, args=args, float_bit=args.float_bit, is_model_pruned=args.is_pruned)
 
     nb_states = env.layer_embedding.shape[1]
-    nb_actions = 2  # actions for weight and activation quantization
+    nb_actions = 1  # actions for weight and activation quantization
     args.rmsize = args.rmsize * len(env.quantizable_idx)  # for each layer
     print('** Actual replay buffer size: {}'.format(args.rmsize))
     agent = optimizer_dict[args.optimizer](nb_states, nb_actions, args)

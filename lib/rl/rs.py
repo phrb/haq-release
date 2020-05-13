@@ -27,13 +27,16 @@ class RS(object):
         print(str(self.design))
         self.design["Top1"] = float("inf")
         self.design["Top5"] = float("inf")
+        self.design["Size"] = float("inf")
+        self.design["SizeRatio"] = float("inf")
 
         self.current_column = 0
         self.current_row = 0
 
         self.episode_end = False
-
         self.current_action = float("inf")
+
+        self.double_bits = False
 
     def update_policy(self):
         pass
@@ -52,18 +55,32 @@ class RS(object):
         print("current_column: {}".format(self.current_column))
         print("design shape: [rows: {0}, cols: {1}]".format(self.design.shape[0],
                                                             self.design.shape[1]))
-        print("accessed rows: [{0}, {1}], [{2}, {3}]".format(self.current_row,
-                                                             self.current_column,
-                                                             self.current_row,
-                                                             self.current_column + 1))
 
-        self.current_action = [self.design.iat[self.current_row, self.current_column],
-                               self.design.iat[self.current_row, self.current_column + 1]]
+        if double_bits:
+            print("accessed rows: [{0}, {1}], [{2}, {3}]".format(self.current_row,
+                                                                 self.current_column,
+                                                                 self.current_row,
+                                                                 self.current_column + 1))
 
-        self.current_column += 2
-        if self.current_column >= self.design.shape[1] - 2:
-            self.current_column = 0
-            self.current_row += 1
+            self.current_action = [self.design.iat[self.current_row,
+                                                   self.current_column],
+                                   self.design.iat[self.current_row,
+                                                   self.current_column + 1]]
+
+            self.current_column += 2
+            if self.current_column >= self.design.shape[1] - 2:
+                self.current_column = 0
+                self.current_row += 1
+        else:
+            print("accessed rows: [{0}, {1}]".format(self.current_row,
+                                                     self.current_column))
+
+            self.current_action = self.design.iat[self.current_row, self.current_column]
+
+            self.current_column += 1
+            if self.current_column >= self.design.shape[1] - 1:
+                self.current_column = 0
+                self.current_row += 1
 
         return self.current_action
 
@@ -76,10 +93,12 @@ class RS(object):
             self.past_episode = episode
             return self.random_action()
 
-    def save_accuracy(self, top1, top5):
+    def save_accuracy(self, top1, top5, size, size_ratio):
         self.episode_end = True
         self.design.at[self.current_row - 1, "Top1"] = top1
         self.design.at[self.current_row - 1, "Top5"] = top5
+        self.design.at[self.current_row - 1, "Size"] = size
+        self.design.at[self.current_row - 1, "SizeRatio"] = size_ratio
         self.design.to_csv("current_results_{0}.csv".format(self.run_id),
                            index = False)
 

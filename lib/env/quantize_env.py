@@ -154,6 +154,8 @@ class QuantizeEnv:
 
             search_space_dict["Top1"] = [top_accs["top1"]]
             search_space_dict["Top5"] = [top_accs["top5"]]
+            search_space_dict["Size"] = [w_size]
+            search_space_dict["SizeRatio"] = [w_size_ratio]
 
             self.search_space = self.search_space.append(pd.DataFrame(search_space_dict))
             self.search_space.to_csv("haq_results_log_{}.csv".format(self.run_id),
@@ -237,6 +239,8 @@ class QuantizeEnv:
         return action  # not constrained here
 
     def _cur_weight(self):
+        # TODO: Compute sizes for quantized biases
+
         cur_weight = 0.
         # quantized
         for i, n_bit in enumerate(self.strategy):

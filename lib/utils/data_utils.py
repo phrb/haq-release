@@ -95,7 +95,7 @@ def get_split_train_dataset(dataset_name, batch_size, n_worker, val_size, train_
         n_train = len(trainset)
         indices = list(range(n_train))
         # shuffle the indices
-        np.random.seed(random_seed)
+        # np.random.seed(random_seed)
         np.random.shuffle(indices)
         assert val_size < n_train, 'val size should less than n_train'
         train_idx, val_idx = indices[val_size:], indices[:val_size]
@@ -156,7 +156,7 @@ def get_split_val_dataset(dataset_name,
         indices = list(range(n_train))
 
         # shuffle the indices
-        np.random.seed(random_seed)
+        #np.random.seed(random_seed)
         np.random.shuffle(indices)
         assert val_size < n_train, 'val size should less than n_train'
 

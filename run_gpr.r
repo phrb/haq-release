@@ -21,7 +21,7 @@ iterations <- 2
 results <- NULL
 
 # Resnet50
-sobol_dim <- 54 * 2
+sobol_dim <- 54 * 1
 
 # vgg19
 # sobol_dim <- 19 * 2
@@ -51,7 +51,7 @@ batch_size <- 128
 cuda_device <- as.integer(args[1])
 resume_run_id <- as.integer(args[2])
 
-size_weight <- 2.0
+size_weight <- 1.0
 top1_weight <- 0.0
 top5_weight <- 1.0
 
@@ -120,12 +120,12 @@ for(i in 1:iterations){
 
         df_design <- data.frame(design)
 
-        names(df_design) <- c(rbind(paste("W",
-                                          seq(1:(sobol_dim / 2)),
-                                          sep = ""),
-                                    paste("A",
-                                          seq(1:(sobol_dim / 2)),
-                                          sep = "")))
+        # names(df_design) <- c(rbind(paste("W",
+        #                                   seq(1:(sobol_dim / 2)),
+        #                                   sep = ""),
+        #                             paste("A",
+        #                                   seq(1:(sobol_dim / 2)),
+        #                                   sep = "")))
 
         write.csv(df_design,
                   paste("current_design_",
@@ -197,41 +197,41 @@ for(i in 1:iterations){
             size_df <- NULL
         }
 
-        size_df <- select(search_space, -Top5, -Top1)
-        formulas <- character(length(names(size_df)))
+        # size_df <- select(search_space, -Top5, -Top1)
+        # formulas <- character(length(names(size_df)))
 
-        for(k in 1:length(names(size_df))){
-            formulas[k] <- paste(names(size_df)[k],
-                                 "e ~ trunc((8 * ",
-                                 names(size_df)[k],
-                                 ") + 1)",
-                                 sep = "")
-        }
+        # for(k in 1:length(names(size_df))){
+        #     formulas[k] <- paste(names(size_df)[k],
+        #                          "e ~ trunc((8 * ",
+        #                          names(size_df)[k],
+        #                          ") + 1)",
+        #                          sep = "")
+        # }
 
-        if(!(is.null(coded_size_df))){
-            rm(coded_size_df)
-            quiet(gc())
-            coded_size_df <- NULL
-        }
+        # if(!(is.null(coded_size_df))){
+        #     rm(coded_size_df)
+        #     quiet(gc())
+        #     coded_size_df <- NULL
+        # }
 
-        coded_size_df <- coded.data(size_df, formulas = lapply(formulas, formula))
-        coded_size_df <- round(data.frame(coded_size_df))
-        coded_size_df$id <- seq(1:length(coded_size_df$A1e))
-        coded_size_df <- gather(coded_size_df, "Layer", "Bitwidth", -id)
+        # coded_size_df <- coded.data(size_df, formulas = lapply(formulas, formula))
+        # coded_size_df <- round(data.frame(coded_size_df))
+        # coded_size_df$id <- seq(1:length(coded_size_df$A1e))
+        # coded_size_df <- gather(coded_size_df, "Layer", "Bitwidth", -id)
 
-        coded_size_df <- coded_size_df %>%
-            group_by(id) %>%
-            do(mutate(., weights_MB = sum((network_specs$parameters *
-                                           (filter(., grepl("W", Layer))$Bitwidth / 8)) / 1e6))) %>%
-            do(mutate(., activations_MB = sum((network_specs$activations *
-                                               (filter(., grepl("A", Layer))$Bitwidth / 8)) / 1e6))) %>%
-            summarize(total_size_MB = unique(weights_MB) + unique(activations_MB),
-                      network_size_MB = sum(network_specs$bits8_size_MB))
+        # coded_size_df <- coded_size_df %>%
+        #     group_by(id) %>%
+        #     do(mutate(., weights_MB = sum((network_specs$parameters *
+        #                                    (filter(., grepl("W", Layer))$Bitwidth / 8)) / 1e6))) %>%
+        #     do(mutate(., activations_MB = sum((network_specs$activations *
+        #                                        (filter(., grepl("A", Layer))$Bitwidth / 8)) / 1e6))) %>%
+        #     summarize(total_size_MB = unique(weights_MB) + unique(activations_MB),
+        #               network_size_MB = sum(network_specs$bits8_size_MB))
 
         print("Search space:")
         print(str(search_space))
-        print("Coded weight df:")
-        print(str(coded_size_df))
+        # print("Coded weight df:")
+        # print(str(coded_size_df))
 
         if(!(is.null(gpr_model))){
             rm(gpr_model)
@@ -239,7 +239,8 @@ for(i in 1:iterations){
             gpr_model <- NULL
         }
 
-        y <- ((size_weight * (coded_size_df$total_size_MB / coded_size_df$network_size_MB)) +
+        #y <- ((size_weight * (coded_size_df$total_size_MB / coded_size_df$network_size_MB)) +
+        y <- ((size_weight * (search_space$SizeRatio)) +
               (top1_weight * ((100.0 - search_space$Top1) / 100.0)) +
               (top5_weight * ((100.0 - search_space$Top5) / 100.0))) /
             (size_weight + top1_weight + top5_weight)
@@ -267,12 +268,12 @@ for(i in 1:iterations){
 
         new_sample <- data.frame(new_sample)
 
-        names(new_sample) <- c(rbind(paste("W",
-                                           seq(1:(sobol_dim / 2)),
-                                           sep = ""),
-                                     paste("A",
-                                           seq(1:(sobol_dim / 2)),
-                                           sep = "")))
+        # names(new_sample) <- c(rbind(paste("W",
+        #                                    seq(1:(sobol_dim / 2)),
+        #                                    sep = ""),
+        #                              paste("A",
+        #                                    seq(1:(sobol_dim / 2)),
+        #                                    sep = "")))
 
         if(is.null(gpr_sample)){
             gpr_sample <- new_sample %>%
@@ -318,12 +319,12 @@ for(i in 1:iterations){
 
         perturbation <- data.frame(perturbation)
 
-        names(perturbation) <- c(rbind(paste("W",
-                                            seq(1:(sobol_dim / 2)),
-                                            sep = ""),
-                                      paste("A",
-                                            seq(1:(sobol_dim / 2)),
-                                            sep = "")))
+        # names(perturbation) <- c(rbind(paste("W",
+        #                                     seq(1:(sobol_dim / 2)),
+        #                                     sep = ""),
+        #                               paste("A",
+        #                                     seq(1:(sobol_dim / 2)),
+        #                                     sep = "")))
 
         perturbation <- (2 * perturbation_range * perturbation) - perturbation_range
 
@@ -364,12 +365,12 @@ for(i in 1:iterations){
                                       -expected_improvement)
 
         df_design <- data.frame(gpr_selected_points)
-        names(df_design) <- c(rbind(paste("W",
-                                          seq(1:(sobol_dim / 2)),
-                                          sep = ""),
-                                    paste("A",
-                                          seq(1:(sobol_dim / 2)),
-                                          sep = "")))
+        # names(df_design) <- c(rbind(paste("W",
+        #                                   seq(1:(sobol_dim / 2)),
+        #                                   sep = ""),
+        #                             paste("A",
+        #                                   seq(1:(sobol_dim / 2)),
+        #                                   sep = "")))
 
         write.csv(df_design,
                   paste("current_design_",
@@ -439,33 +440,33 @@ for(i in 1:iterations){
     # top5 only
     # best_points <- filter(search_space, Top5 == max(Top5))
 
-    size_df <- select(search_space, -Top5, -Top1)
-    formulas <- character(length(names(size_df)))
+    # size_df <- select(search_space, -Top5, -Top1)
+    # formulas <- character(length(names(size_df)))
 
-    for(k in 1:length(names(size_df))){
-        formulas[k] <- paste(names(size_df)[k],
-                             "e ~ trunc((8 * ",
-                             names(size_df)[k],
-                             ") + 1)",
-                             sep = "")
-    }
+    # for(k in 1:length(names(size_df))){
+    #     formulas[k] <- paste(names(size_df)[k],
+    #                          "e ~ trunc((8 * ",
+    #                          names(size_df)[k],
+    #                          ") + 1)",
+    #                          sep = "")
+    # }
 
-    coded_size_df <- coded.data(size_df, formulas = lapply(formulas, formula))
-    coded_size_df <- round(data.frame(coded_size_df))
-    coded_size_df$id <- seq(1:length(coded_size_df$A1e))
-    coded_size_df <- gather(coded_size_df, "Layer", "Bitwidth", -id)
+    # coded_size_df <- coded.data(size_df, formulas = lapply(formulas, formula))
+    # coded_size_df <- round(data.frame(coded_size_df))
+    # coded_size_df$id <- seq(1:length(coded_size_df$A1e))
+    # coded_size_df <- gather(coded_size_df, "Layer", "Bitwidth", -id)
 
-    coded_size_df <- coded_size_df %>%
-        group_by(id) %>%
-        do(mutate(., weights_MB = sum((network_specs$parameters *
-                                       (filter(., grepl("W", Layer))$Bitwidth / 8)) / 1e6))) %>%
-        do(mutate(., activations_MB = sum((network_specs$activations *
-                                           (filter(., grepl("A", Layer))$Bitwidth / 8)) / 1e6))) %>%
-        summarize(total_size_MB = unique(weights_MB) + unique(activations_MB),
-                  network_size_MB = sum(network_specs$bits8_size_MB))
+    # coded_size_df <- coded_size_df %>%
+    #     group_by(id) %>%
+    #     do(mutate(., weights_MB = sum((network_specs$parameters *
+    #                                    (filter(., grepl("W", Layer))$Bitwidth / 8)) / 1e6))) %>%
+    #     do(mutate(., activations_MB = sum((network_specs$activations *
+    #                                        (filter(., grepl("A", Layer))$Bitwidth / 8)) / 1e6))) %>%
+    #     summarize(total_size_MB = unique(weights_MB) + unique(activations_MB),
+    #               network_size_MB = sum(network_specs$bits8_size_MB))
 
     response_data <- search_space %>%
-        mutate(performance_metric = ((size_weight * (coded_size_df$total_size_MB / coded_size_df$network_size_MB)) +
+        mutate(performance_metric = ((size_weight * (search_space$SizeRatio)) +
                                      (top1_weight * ((100.0 - search_space$Top1) / 100.0)) +
                                      (top5_weight * ((100.0 - search_space$Top5) / 100.0))) /
                    (size_weight + top1_weight + top5_weight))
