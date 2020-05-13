@@ -235,10 +235,6 @@ class QuantizeEnv:
         # action = (rbound - lbound) * action + lbound
         lbound, rbound = min_bit, max_bit
         action = (rbound * action) + lbound
-        print("Rounded values:")
-        print(str(int(np.round(action, 0))))
-        print("Trunc'ed values:")
-        print(str(int(np.trunc(action))))
         action = int(np.trunc(action))
         self.last_action = action
         return action  # not constrained here
