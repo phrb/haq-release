@@ -33,10 +33,10 @@ bit_min <- 1
 bit_max <- 8
 perturbation_range <- 3 * (bit_min / bit_max)
 
-gpr_iterations <- 33
-gpr_added_points <- 1
+gpr_iterations <- 30
+gpr_added_points <- 3
 
-gpr_added_neighbours <- 2
+gpr_added_neighbours <- 3
 gpr_neighbourhood_factor <- 1000
 
 gpr_sample_size <- 60 * sobol_dim
@@ -51,7 +51,7 @@ batch_size <- 128
 cuda_device <- as.integer(args[1])
 resume_run_id <- as.integer(args[2])
 
-size_weight <- 1.0
+size_weight <- 10.0
 top1_weight <- 0.0
 top5_weight <- 1.0
 
@@ -246,7 +246,7 @@ for(i in 1:iterations){
             (size_weight + top1_weight + top5_weight)
 
         gpr_model <- km(formula = ~ .,
-                        design = select(search_space, -Top5, -Top1),
+                        design = select(search_space, -Top5, -Top1, -Size, -SizeRatio),
                         response = y,
                         nugget = 1e-8 * var(y),
                         control = list(pop.size = 400,
