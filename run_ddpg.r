@@ -11,13 +11,13 @@ quiet <- function(x) {
 iterations <- 2
 results <- NULL
 
-total_measurements <- 2 * 108
 
 network <- "resnet50"
 preserve_ratio <- 0.1
 batch_size <- 128
 cuda_device <- as.integer(args[1])
-warmup = 108
+warmup <- 64
+total_measurements <- 244
 
 for(i in 1:iterations){
     run_id <- round(100000 * runif(1))
