@@ -210,21 +210,21 @@ class QuantizeEnv:
         return self.cur_ind == len(self.quantizable_idx) - 1
 
     def _final_action_wall(self):
-        target = self.compress_ratio * self._org_weight()
-        min_weight = 0
-        for i, n_bit in enumerate(self.strategy):
-            min_weight += self.wsize_list[i] * self.min_bit
-        while min_weight < self._cur_weight() and target < self._cur_weight():
-            for i, n_bit in enumerate(reversed(self.strategy)):
-                if type(n_bit) == list:
-                    if n_bit[0] > self.min_bit:
-                        self.strategy[-(i+1)][0] -= 1
-                else:
-                    if n_bit > self.min_bit:
-                        self.strategy[-(i+1)] -= 1
+        # target = self.compress_ratio * self._org_weight()
+        # min_weight = 0
+        # for i, n_bit in enumerate(self.strategy):
+        #     min_weight += self.wsize_list[i] * self.min_bit
+        # while min_weight < self._cur_weight() and target < self._cur_weight():
+        #     for i, n_bit in enumerate(reversed(self.strategy)):
+        #         if type(n_bit) == list:
+        #             if n_bit[0] > self.min_bit:
+        #                 self.strategy[-(i+1)][0] -= 1
+        #         else:
+        #             if n_bit > self.min_bit:
+        #                 self.strategy[-(i+1)] -= 1
 
-                if target >= self._cur_weight():
-                    break
+        #         if target >= self._cur_weight():
+        #             break
 
         print('=> Final action list: {}'.format(self.strategy))
 
